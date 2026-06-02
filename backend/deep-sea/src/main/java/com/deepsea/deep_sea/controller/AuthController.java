@@ -2,14 +2,14 @@ package com.deepsea.deep_sea.controller;
 
 import com.deepsea.deep_sea.dto.LoginRequestDTO;
 import com.deepsea.deep_sea.model.User;
-import com.deepsea.deep_sea.repository.UserRepository;
-import com.deepsea.deep_sea.repository.VerificationTokenRepository;
+//import com.deepsea.deep_sea.repository.UserRepository;
+//import com.deepsea.deep_sea.repository.VerificationTokenRepository;
 import com.deepsea.deep_sea.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.mail.javamail.JavaMailSender;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
