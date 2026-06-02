@@ -4,9 +4,8 @@ import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.VerificationToken;
 import com.deepsea.deep_sea.repository.UserRepository;
 import com.deepsea.deep_sea.repository.VerificationTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,5 +91,25 @@ public class UserService {
         // Purge token to ensure single-use integrity
         tokenRepository.delete(token);
         return true;
+    }
+    
+    @Transactional
+    public User loginUser(String email, String rawPassword) {
+        // Check if the user exists
+        User user = userRepository.findByEmail(email.toLowerCase().trim())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+
+        // Ensure they verified their email link first
+        if (!user.isEnabled()) {
+            throw new IllegalStateException("Please verify your email address via the link sent to your inbox before logging in.");
+        }
+
+        // Verify the password hash matches the raw input
+        if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid email or password.");
+        }
+
+        // Return the authenticated user 
+        return user;
     }
 }

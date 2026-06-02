@@ -1,9 +1,16 @@
 package com.deepsea.deep_sea.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Data 
+@NoArgsConstructor
+@AllArgsConstructor
 public class ObservationRequestDTO {
 
     @NotNull(message = "Mission ID is required")
