@@ -1,7 +1,7 @@
 package com.deepsea.deep_sea.controller;
 
 import com.deepsea.deep_sea.model.Species;
-import com.deepsea.deep_sea.repository.SpeciesRepository;
+import com.deepsea.deep_sea.service.SpeciesService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +14,10 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class SpeciesController {
 
-    private final SpeciesRepository speciesRepository;
-    
-    public SpeciesController(SpeciesRepository speciesRepository) {
-    	this.speciesRepository = speciesRepository;
+    private final SpeciesService speciesService;
+
+    public SpeciesController(SpeciesService speciesService) {
+        this.speciesService = speciesService;
     }
 
     @PostMapping
@@ -30,11 +30,15 @@ public class SpeciesController {
                     .body("Access Denied: Public accounts cannot alter taxonomic lists.");
         }
 
-        return ResponseEntity.ok(speciesRepository.save(species));
+        try {
+            return ResponseEntity.ok(speciesService.addSpecies(species));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<Species>> getAllSpecies() {
-        return ResponseEntity.ok(speciesRepository.findAll());
+        return ResponseEntity.ok(speciesService.getAllSpecies());
     }
 }

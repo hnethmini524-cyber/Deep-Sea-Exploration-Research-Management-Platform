@@ -1,7 +1,7 @@
 package com.deepsea.deep_sea.controller;
 
 import com.deepsea.deep_sea.model.ResearchArea;
-import com.deepsea.deep_sea.repository.ResearchAreaRepository;
+import com.deepsea.deep_sea.service.ResearchAreaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +14,12 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ResearchAreaController {
 
-    private final ResearchAreaRepository areaRepository;
-    
-    public ResearchAreaController(ResearchAreaRepository areaRepository) {
-    	this.areaRepository = areaRepository;
+    private final ResearchAreaService areaService;
+
+    public ResearchAreaController(ResearchAreaService areaService) {
+        this.areaService = areaService;
     }
 
-    // Only researchers/admins can establish new collection fields
     @PostMapping
     public ResponseEntity<?> createArea(
             @RequestAttribute("userRole") String userRole,
@@ -31,12 +30,15 @@ public class ResearchAreaController {
                     .body("Access Denied: Public accounts cannot register geographical areas.");
         }
         
-        return ResponseEntity.ok(areaRepository.save(area));
+        try {
+            return ResponseEntity.ok(areaService.createArea(area));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    // Anyone can view exploration sectors
     @GetMapping
     public ResponseEntity<List<ResearchArea>> getAllAreas() {
-        return ResponseEntity.ok(areaRepository.findAll());
+        return ResponseEntity.ok(areaService.getAllAreas());
     }
 }
