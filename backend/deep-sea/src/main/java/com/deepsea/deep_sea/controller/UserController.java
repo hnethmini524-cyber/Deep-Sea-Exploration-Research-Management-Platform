@@ -1,8 +1,9 @@
 package com.deepsea.deep_sea.controller;
 
-import com.deepsea.deep_sea.model.User;
-import com.deepsea.deep_sea.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.deepsea.deep_sea.dto.UserResponseDTO;
+import com.deepsea.deep_sea.model.enums.UserRole;
+import com.deepsea.deep_sea.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,30 +12,29 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@CrossOrigin(origins = "*") // To react integration
+@CrossOrigin(origins = "${app.cors.allowed-origins:*}")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
 
-    // Used by Admin/Researchers to view all scientific staff
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/researchers")
-    public ResponseEntity<List<User>> getAllResearchers() {
-        // Fetch only users who are actual internal staff members
-        List<User> researchers = userRepository.findAll().stream()
-                .filter(user -> "RESEARCHER".equalsIgnoreCase(user.getRole()))
-                .toList();
+    public ResponseEntity<List<UserResponseDTO>> getAllResearchers() {
+        // Database level filtration using modern repository custom queries
+        List<UserResponseDTO> researchers = userService.findUsersByRole(UserRole.RESEARCHER);
         return ResponseEntity.ok(researchers);
     }
 
-    // Used to load an individual researcher's profile page
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserProfile(@PathVariable UUID id) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    user.setPasswordHash(null);
-                    return ResponseEntity.ok(user);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            UserResponseDTO userProfile = userService.findUserById(id);
+            return ResponseEntity.ok(userProfile);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

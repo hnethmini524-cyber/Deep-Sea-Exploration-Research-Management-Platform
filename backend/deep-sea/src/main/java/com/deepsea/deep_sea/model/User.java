@@ -6,11 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import java.util.UUID;
+
+import com.deepsea.deep_sea.model.enums.UserRole;
 
 @Entity
 @Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -32,8 +36,9 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String role; // "ADMIN", "RESEARCHER" or "PUBLIC"
+    private UserRole role;
 
     @Column(length = 100)
     private String specialization;
@@ -42,5 +47,6 @@ public class User {
     private String institution;
     
     @Column(nullable = false)
+    @Builder.Default
     private boolean enabled = false; // System defaults to false until email is verified
 }
