@@ -5,11 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.util.UUID;
 
 @Entity
 @Table(name = "research_areas")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResearchArea {

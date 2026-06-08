@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface ResearchAreaRepository extends JpaRepository<ResearchArea, UUID> {
-	Optional<ResearchArea> findByAreaNameIgnoreCase(String areaName);
+    Optional<ResearchArea> findByAreaNameIgnoreCase(String areaName);
 }

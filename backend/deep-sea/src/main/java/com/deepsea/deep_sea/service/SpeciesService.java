@@ -1,5 +1,7 @@
 package com.deepsea.deep_sea.service;
 
+import com.deepsea.deep_sea.dto.SpeciesRequestDTO;
+import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
 import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.repository.SpeciesRepository;
 import org.springframework.stereotype.Service;
@@ -16,28 +18,36 @@ public class SpeciesService {
         this.speciesRepository = speciesRepository;
     }
 
-    @Transactional
-    public List<Species> getAllSpecies() {
-        return speciesRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<SpeciesResponseDTO> getAllSpecies() {
+        return speciesRepository.findAll().stream()
+                .map(SpeciesResponseDTO::fromEntity)
+                .toList();
     }
 
-    @Transactional
-    public Species getSpeciesById(UUID id) {
+    @Transactional(readOnly = true)
+    public SpeciesResponseDTO getSpeciesById(UUID id) {
         return speciesRepository.findById(id)
+                .map(SpeciesResponseDTO::fromEntity)
                 .orElseThrow(() -> new IllegalArgumentException("Species profile not found with ID: " + id));
     }
 
     @Transactional
-    public Species addSpecies(Species species) {
-        // Match taxonomy strictly via standard universal scientific naming
-        String stylizedScientificName = species.getScientificName().trim();
+    public SpeciesResponseDTO addSpecies(SpeciesRequestDTO dto) {
+        String stylizedScientificName = dto.getScientificName().trim();
+        
         if (speciesRepository.findByScientificNameIgnoreCase(stylizedScientificName).isPresent()) {
             throw new IllegalArgumentException("Species classification '" + stylizedScientificName + "' is already registered.");
         }
 
-        species.setScientificName(stylizedScientificName);
-        species.setCommonName(species.getCommonName().trim());
-        
-        return speciesRepository.save(species);
+        Species species = Species.builder()
+                .scientificName(stylizedScientificName)
+                .commonName(dto.getCommonName().trim())
+                .category(dto.getCategory().trim())
+                .description(dto.getDescription())
+                .build();
+
+        Species savedSpecies = speciesRepository.save(species);
+        return SpeciesResponseDTO.fromEntity(savedSpecies);
     }
 }

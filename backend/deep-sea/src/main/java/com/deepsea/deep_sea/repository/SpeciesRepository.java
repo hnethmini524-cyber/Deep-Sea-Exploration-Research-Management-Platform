@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface SpeciesRepository extends JpaRepository<Species, UUID> {
-	Optional<Species> findByScientificNameIgnoreCase(String scientificName);
+    Optional<Species> findByScientificNameIgnoreCase(String scientificName);
 }

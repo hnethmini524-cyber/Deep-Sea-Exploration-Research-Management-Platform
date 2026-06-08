@@ -1,17 +1,20 @@
 package com.deepsea.deep_sea.controller;
 
-import com.deepsea.deep_sea.model.ResearchArea;
+import com.deepsea.deep_sea.dto.ResearchAreaRequestDTO;
+import com.deepsea.deep_sea.dto.ResearchAreaResponseDTO;
 import com.deepsea.deep_sea.service.ResearchAreaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/areas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:*}")
 public class ResearchAreaController {
 
     private final ResearchAreaService areaService;
@@ -21,24 +24,28 @@ public class ResearchAreaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createArea(
-            @RequestAttribute("userRole") String userRole,
-            @Valid @RequestBody ResearchArea area) {
-        
-        if ("PUBLIC".equalsIgnoreCase(userRole)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Access Denied: Public accounts cannot register geographical areas.");
-        }
-        
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
+    public ResponseEntity<?> createArea(@Valid @RequestBody ResearchAreaRequestDTO areaDto) {
         try {
-            return ResponseEntity.ok(areaService.createArea(area));
+            ResearchAreaResponseDTO response = areaService.createArea(areaDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<ResearchArea>> getAllAreas() {
+    public ResponseEntity<List<ResearchAreaResponseDTO>> getAllAreas() {
         return ResponseEntity.ok(areaService.getAllAreas());
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAreaById(@PathVariable UUID id) {
+        try {
+            ResearchAreaResponseDTO response = areaService.getAreaById(id);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
