@@ -2,6 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.SpeciesRequestDTO;
 import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
+import com.deepsea.deep_sea.exception.BadRequestException;
+import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.repository.SpeciesRepository;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class SpeciesService {
     public SpeciesResponseDTO getSpeciesById(UUID id) {
         return speciesRepository.findById(id)
                 .map(speciesMapper::toResponseDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Species profile not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Species profile not found with ID: " + id));
     }
 
     @Transactional
@@ -40,7 +42,7 @@ public class SpeciesService {
         String stylizedScientificName = dto.getScientificName().trim();
         
         if (speciesRepository.findByScientificNameIgnoreCase(stylizedScientificName).isPresent()) {
-            throw new IllegalArgumentException("Species classification '" + stylizedScientificName + "' is already registered.");
+            throw new BadRequestException("Species classification '" + stylizedScientificName + "' is already registered.");
         }
 
         Species species = Species.builder()

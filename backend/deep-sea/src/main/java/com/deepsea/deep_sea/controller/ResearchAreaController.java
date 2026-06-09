@@ -26,12 +26,8 @@ public class ResearchAreaController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
     public ResponseEntity<?> createArea(@Valid @RequestBody ResearchAreaRequestDTO areaDto) {
-        try {
             ResearchAreaResponseDTO response = areaService.createArea(areaDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @GetMapping
@@ -41,11 +37,7 @@ public class ResearchAreaController {
     
     @GetMapping("/{id}")
     public ResponseEntity<?> getAreaById(@PathVariable UUID id) {
-        try {
             ResearchAreaResponseDTO response = areaService.getAreaById(id);
             return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 }

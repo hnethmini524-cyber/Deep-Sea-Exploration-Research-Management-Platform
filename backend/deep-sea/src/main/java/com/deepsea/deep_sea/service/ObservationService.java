@@ -2,6 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.ObservationRequestDTO;
 import com.deepsea.deep_sea.dto.ObservationResponseDTO;
+import com.deepsea.deep_sea.exception.BadRequestException;
+import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.mapper.ObservationMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.enums.MissionStatus;
@@ -44,15 +46,15 @@ public class ObservationService {
     @Transactional
     public ObservationResponseDTO saveObservation(ObservationRequestDTO dto) {
         Mission mission = missionRepository.findById(dto.getMissionId())
-                .orElseThrow(() -> new IllegalArgumentException("Target mission does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Target mission does not exist."));
 
         // Use type-safe Enum matching to preserve invariant domain rules
         if (MissionStatus.ACTIVE != mission.getStatus()) {
-            throw new IllegalStateException("Cannot log findings. Target mission is currently: " + mission.getStatus());
+            throw new BadRequestException("Cannot log findings. Target mission is currently: " + mission.getStatus());
         }
 
         Species species = speciesRepository.findById(dto.getSpeciesId())
-                .orElseThrow(() -> new IllegalArgumentException("Target biological species taxonomy profile does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Target biological species taxonomy profile does not exist."));
 
         Observation observation = Observation.builder()
                 .depthMeters(dto.getDepthMeters())

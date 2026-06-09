@@ -2,6 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.SampleRequestDTO;
 import com.deepsea.deep_sea.dto.SampleResponseDTO;
+import com.deepsea.deep_sea.exception.BadRequestException;
+import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.mapper.SampleMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.Sample;
@@ -44,30 +46,30 @@ public class SampleService {
     public SampleResponseDTO getSampleById(UUID id) {
         return sampleRepository.findById(id)
                 .map(sampleMapper::toResponseDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Target physical sample asset not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Target physical sample asset not found with ID: " + id));
     }
 
     @Transactional
     public SampleResponseDTO createSample(SampleRequestDTO dto) {
         Mission mission = missionRepository.findById(dto.getMissionId())
-                .orElseThrow(() -> new IllegalArgumentException("Assigned mission execution scope does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Assigned mission execution scope does not exist."));
 
         User collector = userRepository.findById(dto.getCollectedById())
-                .orElseThrow(() -> new IllegalArgumentException("Assigned biological field technician/researcher does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Assigned biological field technician/researcher does not exist."));
 
         if (MissionStatus.ACTIVE != mission.getStatus()) {
-            throw new IllegalStateException("Process Aborted: Cannot log samples for an inactive mission profile.");
+            throw new BadRequestException("Process Aborted: Cannot log samples for an inactive mission profile.");
         }
 
         if (UserRole.PUBLIC == collector.getRole()) {
-            throw new IllegalArgumentException("Access Denied: Specified employee credentials lack operational logging rights.");
+            throw new BadRequestException("Access Denied: Specified employee credentials lack operational logging rights.");
         }
 
         SampleType parsedType;
         try {
             parsedType = SampleType.valueOf(dto.getType().toUpperCase().trim());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unsupported taxonomic physical sample type: " + dto.getType());
+            throw new BadRequestException("Unsupported taxonomic physical sample type: " + dto.getType());
         }
 
         Sample sample = Sample.builder()

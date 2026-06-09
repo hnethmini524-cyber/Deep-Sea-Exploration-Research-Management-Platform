@@ -25,12 +25,8 @@ public class ObservationController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
     public ResponseEntity<?> logObservation(@Valid @RequestBody ObservationRequestDTO dto) {
-        try {
             ObservationResponseDTO response = observationService.saveObservation(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @GetMapping

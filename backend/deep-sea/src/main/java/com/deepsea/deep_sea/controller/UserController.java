@@ -30,11 +30,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserProfile(@PathVariable UUID id) {
-        try {
             UserResponseDTO userProfile = userService.findUserById(id);
             return ResponseEntity.ok(userProfile);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-    }
 }

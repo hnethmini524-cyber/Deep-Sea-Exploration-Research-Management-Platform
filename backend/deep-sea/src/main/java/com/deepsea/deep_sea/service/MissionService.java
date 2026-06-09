@@ -2,6 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.MissionRequestDTO;
 import com.deepsea.deep_sea.dto.MissionResponseDTO;
+import com.deepsea.deep_sea.exception.BadRequestException;
+import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.mapper.MissionMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.ResearchArea;
@@ -45,30 +47,30 @@ public class MissionService {
     public MissionResponseDTO getMissionById(UUID id) {
         return missionRepository.findById(id)
                 .map(missionMapper::toResponseDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Mission workspace not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Mission workspace not found with ID: " + id));
     }
 
     @Transactional
     public MissionResponseDTO createMission(MissionRequestDTO dto) {
     	User leader = userRepository.findById(dto.getLeadResearcherId())
-                .orElseThrow(() -> new IllegalArgumentException("Assigned researcher profile does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Assigned researcher profile does not exist."));
 
         ResearchArea area = areaRepository.findById(dto.getResearchAreaId())
-                .orElseThrow(() -> new IllegalArgumentException("Target geographical research area does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Target geographical research area does not exist."));
 
         if (UserRole.PUBLIC == leader.getRole()) {
-            throw new IllegalArgumentException("Access Denied: Account type 'PUBLIC' lacks authorization to lead scientific missions.");
+            throw new BadRequestException("Access Denied: Account type 'PUBLIC' lacks authorization to lead scientific missions.");
         }
 
         if (dto.getCompletionDate() != null && dto.getCompletionDate().isBefore(dto.getLaunchDate())) {
-            throw new IllegalArgumentException("Invalid Timeline: Completion date cannot be prior to the launch date.");
+            throw new BadRequestException("Invalid Timeline: Completion date cannot be prior to the launch date.");
         }
 
         MissionStatus parsedStatus;
         try {
             parsedStatus = MissionStatus.valueOf(dto.getStatus().toUpperCase().trim());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unsupported mission status state value: " + dto.getStatus());
+            throw new BadRequestException("Unsupported mission status state value: " + dto.getStatus());
         }
 
         Mission mission = Mission.builder()

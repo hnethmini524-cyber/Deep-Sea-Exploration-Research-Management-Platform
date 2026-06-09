@@ -26,12 +26,8 @@ public class SampleController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')")
     public ResponseEntity<?> createSample(@Valid @RequestBody SampleRequestDTO sampleDto) {
-        try {
             SampleResponseDTO response = sampleService.createSample(sampleDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @GetMapping
@@ -41,10 +37,6 @@ public class SampleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getSampleById(@PathVariable UUID id) {
-        try {
             return ResponseEntity.ok(sampleService.getSampleById(id));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 }

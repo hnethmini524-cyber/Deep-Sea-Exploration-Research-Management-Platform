@@ -2,6 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.RegistrationRequestDTO;
 import com.deepsea.deep_sea.dto.UserResponseDTO;
+import com.deepsea.deep_sea.exception.BadRequestException;
+import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.mapper.UserMapper;
 import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.enums.UserRole;
@@ -94,14 +96,14 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDTO loginUser(String email, String rawPassword) {
         User user = userRepository.findByEmail(email.toLowerCase().trim())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+                .orElseThrow(() -> new BadRequestException("Invalid email or password."));
 
         if (!user.isEnabled()) {
-            throw new IllegalStateException("Please verify your email address via the link sent to your inbox before logging in.");
+            throw new BadRequestException("Please verify your email address via the link sent to your inbox before logging in.");
         }
 
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid email or password.");
+            throw new BadRequestException("Invalid email or password.");
         }
 
         return userMapper.toResponseDTO(user);
@@ -118,7 +120,7 @@ public class UserService {
     public UserResponseDTO findUserById(UUID id) {
         return userRepository.findById(id)
                 .map(userMapper::toResponseDTO)
-                .orElseThrow(() -> new IllegalArgumentException("User profile not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User profile not found."));
     }
 
     private void sendVerificationEmail(String recipientEmail, String token) {

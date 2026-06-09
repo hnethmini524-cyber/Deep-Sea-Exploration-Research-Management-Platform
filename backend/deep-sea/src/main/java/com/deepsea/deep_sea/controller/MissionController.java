@@ -26,12 +26,8 @@ public class MissionController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
     public ResponseEntity<?> createMission(@Valid @RequestBody MissionRequestDTO missionDto) {
-        try {
             MissionResponseDTO response = missionService.createMission(missionDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @GetMapping
@@ -41,10 +37,6 @@ public class MissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getMissionById(@PathVariable UUID id) {
-        try {
             return ResponseEntity.ok(missionService.getMissionById(id));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
+        } 
 }
