@@ -2,6 +2,7 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.SampleRequestDTO;
 import com.deepsea.deep_sea.dto.SampleResponseDTO;
+import com.deepsea.deep_sea.mapper.SampleMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.Sample;
 import com.deepsea.deep_sea.model.User;
@@ -21,26 +22,28 @@ public class SampleService {
     private final SampleRepository sampleRepository;
     private final MissionRepository missionRepository;
     private final UserRepository userRepository;
+    private final SampleMapper sampleMapper;
 
     public SampleService(SampleRepository sampleRepository, 
                          MissionRepository missionRepository, 
-                         UserRepository userRepository) {
+                         UserRepository userRepository,SampleMapper sampleMapper) {
         this.sampleRepository = sampleRepository;
         this.missionRepository = missionRepository;
         this.userRepository = userRepository;
+        this.sampleMapper = sampleMapper;
     }
 
     @Transactional(readOnly = true)
     public List<SampleResponseDTO> getAllSamples() {
         return sampleRepository.findAllWithFullContext().stream()
-                .map(SampleResponseDTO::fromEntity)
+                .map(sampleMapper::toResponseDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public SampleResponseDTO getSampleById(UUID id) {
         return sampleRepository.findById(id)
-                .map(SampleResponseDTO::fromEntity)
+                .map(sampleMapper::toResponseDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Target physical sample asset not found with ID: " + id));
     }
 
@@ -76,6 +79,6 @@ public class SampleService {
                 .build();
 
         Sample savedSample = sampleRepository.save(sample);
-        return SampleResponseDTO.fromEntity(savedSample);
+        return sampleMapper.toResponseDTO(savedSample);
     }
 }

@@ -2,6 +2,7 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.RegistrationRequestDTO;
 import com.deepsea.deep_sea.dto.UserResponseDTO;
+import com.deepsea.deep_sea.mapper.UserMapper;
 import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.enums.UserRole;
 import com.deepsea.deep_sea.model.VerificationToken;
@@ -24,6 +25,7 @@ public class UserService {
     private final VerificationTokenRepository tokenRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final UserMapper userMapper;
 
     @Value("${app.auth.org-domain:@deepsearesearch.org}")
     private String orgDomain;
@@ -34,11 +36,12 @@ public class UserService {
     public UserService(UserRepository userRepository, 
                        VerificationTokenRepository tokenRepository, 
                        BCryptPasswordEncoder passwordEncoder, 
-                       JavaMailSender mailSender) {
+                       JavaMailSender mailSender,UserMapper userMapper) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
+        this.userMapper = userMapper;
     }
 
     @Transactional
@@ -101,20 +104,20 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email or password.");
         }
 
-        return UserResponseDTO.fromEntity(user);
+        return userMapper.toResponseDTO(user);
     }
 
     @Transactional(readOnly = true)
     public List<UserResponseDTO> findUsersByRole(UserRole role) {
         return userRepository.findAllByRole(role).stream()
-                .map(UserResponseDTO::fromEntity)
+                .map(userMapper::toResponseDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public UserResponseDTO findUserById(UUID id) {
         return userRepository.findById(id)
-                .map(UserResponseDTO::fromEntity)
+                .map(userMapper::toResponseDTO)
                 .orElseThrow(() -> new IllegalArgumentException("User profile not found."));
     }
 

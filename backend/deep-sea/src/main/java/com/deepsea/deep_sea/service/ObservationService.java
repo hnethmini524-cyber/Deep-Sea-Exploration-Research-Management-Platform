@@ -2,6 +2,7 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.ObservationRequestDTO;
 import com.deepsea.deep_sea.dto.ObservationResponseDTO;
+import com.deepsea.deep_sea.mapper.ObservationMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.enums.MissionStatus;
 import com.deepsea.deep_sea.model.Observation;
@@ -22,19 +23,21 @@ public class ObservationService {
     private final ObservationRepository observationRepository;
     private final MissionRepository missionRepository;
     private final SpeciesRepository speciesRepository;
+    private final ObservationMapper observationMapper;
 
     public ObservationService(ObservationRepository observationRepository, 
                               MissionRepository missionRepository, 
-                              SpeciesRepository speciesRepository) {
+                              SpeciesRepository speciesRepository,ObservationMapper observationMapper) {
         this.observationRepository = observationRepository;
         this.missionRepository = missionRepository;
         this.speciesRepository = speciesRepository;
+        this.observationMapper = observationMapper;
     }
 
     @Transactional(readOnly = true)
     public List<ObservationResponseDTO> getAllObservations() {
         return observationRepository.findAllWithAssociations().stream()
-                .map(ObservationResponseDTO::fromEntity)
+                .map(observationMapper::toResponseDTO)
                 .toList();
     }
 
@@ -60,6 +63,6 @@ public class ObservationService {
                 .build();
 
         Observation savedLog = observationRepository.save(observation);
-        return ObservationResponseDTO.fromEntity(savedLog);
+        return observationMapper.toResponseDTO(savedLog);
     }
 }

@@ -1,6 +1,6 @@
 package com.deepsea.deep_sea.dto;
 
-import com.deepsea.deep_sea.model.Observation;
+//import com.deepsea.deep_sea.model.Observation;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -17,15 +17,4 @@ public class ObservationResponseDTO {
     private UUID speciesId;
     private String speciesScientificName;
 
-    public static ObservationResponseDTO fromEntity(Observation observation) {
-        return ObservationResponseDTO.builder()
-                .id(observation.getId())
-                .depthMeters(observation.getDepthMeters())
-                .behaviorNotes(observation.getBehaviorNotes())
-                .observedAt(observation.getObservedAt())
-                .missionId(observation.getMission().getId())
-                .speciesId(observation.getSpecies().getId())
-                .speciesScientificName(observation.getSpecies().getScientificName())
-                .build();
-    }
 }

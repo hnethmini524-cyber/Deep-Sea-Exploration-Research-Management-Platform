@@ -1,6 +1,6 @@
 package com.deepsea.deep_sea.dto;
 
-import com.deepsea.deep_sea.model.Species;
+//import com.deepsea.deep_sea.model.Species;
 import lombok.Builder;
 import lombok.Data;
 import java.util.UUID;
@@ -14,13 +14,4 @@ public class SpeciesResponseDTO {
     private String category;
     private String description;
 
-    public static SpeciesResponseDTO fromEntity(Species species) {
-        return SpeciesResponseDTO.builder()
-                .id(species.getId())
-                .commonName(species.getCommonName())
-                .scientificName(species.getScientificName())
-                .category(species.getCategory())
-                .description(species.getDescription())
-                .build();
-    }
 }

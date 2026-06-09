@@ -2,6 +2,7 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.MissionRequestDTO;
 import com.deepsea.deep_sea.dto.MissionResponseDTO;
+import com.deepsea.deep_sea.mapper.MissionMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.ResearchArea;
 import com.deepsea.deep_sea.model.User;
@@ -22,26 +23,28 @@ public class MissionService {
     private final MissionRepository missionRepository;
     private final UserRepository userRepository;
     private final ResearchAreaRepository areaRepository;
+    private final MissionMapper missionMapper;
 
     public MissionService(MissionRepository missionRepository, 
                           UserRepository userRepository, 
-                          ResearchAreaRepository areaRepository) {
+                          ResearchAreaRepository areaRepository,MissionMapper missionMapper) {
         this.missionRepository = missionRepository;
         this.userRepository = userRepository;
         this.areaRepository = areaRepository;
+        this.missionMapper = missionMapper;
     }
 
     @Transactional(readOnly = true)
     public List<MissionResponseDTO> getAllMissions() {
         return missionRepository.findAllWithAssociations().stream()
-                .map(MissionResponseDTO::fromEntity)
+                .map(missionMapper::toResponseDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public MissionResponseDTO getMissionById(UUID id) {
         return missionRepository.findById(id)
-                .map(MissionResponseDTO::fromEntity)
+                .map(missionMapper::toResponseDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Mission workspace not found with ID: " + id));
     }
 
@@ -78,6 +81,6 @@ public class MissionService {
                 .build();
 
         Mission savedMission = missionRepository.save(mission);
-        return MissionResponseDTO.fromEntity(savedMission);
+        return missionMapper.toResponseDTO(savedMission);
     }
 }

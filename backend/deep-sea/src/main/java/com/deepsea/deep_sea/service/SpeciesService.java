@@ -5,6 +5,7 @@ import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
 import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.repository.SpeciesRepository;
 import org.springframework.stereotype.Service;
+import com.deepsea.deep_sea.mapper.SpeciesMapper;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -13,22 +14,24 @@ import java.util.UUID;
 public class SpeciesService {
 
     private final SpeciesRepository speciesRepository;
+    private final SpeciesMapper speciesMapper;
 
-    public SpeciesService(SpeciesRepository speciesRepository) {
+    public SpeciesService(SpeciesRepository speciesRepository,SpeciesMapper speciesMapper) {
         this.speciesRepository = speciesRepository;
+        this.speciesMapper = speciesMapper;
     }
 
     @Transactional(readOnly = true)
     public List<SpeciesResponseDTO> getAllSpecies() {
         return speciesRepository.findAll().stream()
-                .map(SpeciesResponseDTO::fromEntity)
+                .map(speciesMapper::toResponseDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public SpeciesResponseDTO getSpeciesById(UUID id) {
         return speciesRepository.findById(id)
-                .map(SpeciesResponseDTO::fromEntity)
+                .map(speciesMapper::toResponseDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Species profile not found with ID: " + id));
     }
 
@@ -48,6 +51,6 @@ public class SpeciesService {
                 .build();
 
         Species savedSpecies = speciesRepository.save(species);
-        return SpeciesResponseDTO.fromEntity(savedSpecies);
+        return speciesMapper.toResponseDTO(savedSpecies);
     }
 }

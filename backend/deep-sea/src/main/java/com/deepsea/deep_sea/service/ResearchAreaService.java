@@ -2,6 +2,7 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.ResearchAreaRequestDTO;
 import com.deepsea.deep_sea.dto.ResearchAreaResponseDTO;
+import com.deepsea.deep_sea.mapper.ResearchAreaMapper;
 import com.deepsea.deep_sea.model.ResearchArea;
 import com.deepsea.deep_sea.repository.ResearchAreaRepository;
 import org.springframework.stereotype.Service;
@@ -13,22 +14,24 @@ import java.util.UUID;
 public class ResearchAreaService {
 
     private final ResearchAreaRepository areaRepository;
+    private final ResearchAreaMapper areaMapper;
 
-    public ResearchAreaService(ResearchAreaRepository areaRepository) {
+    public ResearchAreaService(ResearchAreaRepository areaRepository,ResearchAreaMapper areaMapper) {
         this.areaRepository = areaRepository;
+        this.areaMapper = areaMapper;
     }
 
     @Transactional(readOnly = true)
     public List<ResearchAreaResponseDTO> getAllAreas() {
         return areaRepository.findAll().stream()
-                .map(ResearchAreaResponseDTO::fromEntity)
+                .map(areaMapper::toResponseDTO)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public ResearchAreaResponseDTO getAreaById(UUID id) {
         return areaRepository.findById(id)
-                .map(ResearchAreaResponseDTO::fromEntity)
+                .map(areaMapper::toResponseDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Research Area not found with ID: " + id));
     }
 
@@ -51,7 +54,7 @@ public class ResearchAreaService {
                 .build();
 
         ResearchArea savedArea = areaRepository.save(area);
-        return ResearchAreaResponseDTO.fromEntity(savedArea);
+        return areaMapper.toResponseDTO(savedArea);
     }
 
     private void validateCoordinates(double latitude, double longitude) {
