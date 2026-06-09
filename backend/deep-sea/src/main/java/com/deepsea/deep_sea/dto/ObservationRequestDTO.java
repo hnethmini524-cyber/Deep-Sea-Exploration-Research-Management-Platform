@@ -1,16 +1,11 @@
 package com.deepsea.deep_sea.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data 
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class ObservationRequestDTO {
 
     @NotNull(message = "Mission ID is required")
@@ -24,7 +19,8 @@ public class ObservationRequestDTO {
     private double depthMeters;
 
     @NotBlank(message = "Behavior notes cannot be blank")
+    @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String behaviorNotes;
 
-    private LocalDateTime observedAt = LocalDateTime.now();
+    private LocalDateTime observedAt;
 }

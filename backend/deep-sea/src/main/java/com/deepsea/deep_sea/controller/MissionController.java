@@ -1,17 +1,20 @@
 package com.deepsea.deep_sea.controller;
 
-import com.deepsea.deep_sea.model.Mission;
+import com.deepsea.deep_sea.dto.MissionRequestDTO;
+import com.deepsea.deep_sea.dto.MissionResponseDTO;
 import com.deepsea.deep_sea.service.MissionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/missions")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:*}")
 public class MissionController {
 
     private final MissionService missionService;
@@ -21,24 +24,27 @@ public class MissionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createMission(
-            @RequestAttribute("userRole") String userRole,
-            @Valid @RequestBody Mission mission) {
-
-        if ("PUBLIC".equalsIgnoreCase(userRole)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Access Denied: Public accounts are limited to read-only access.");
-        }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
+    public ResponseEntity<?> createMission(@Valid @RequestBody MissionRequestDTO missionDto) {
         try {
-            return ResponseEntity.ok(missionService.createMission(mission));
+            MissionResponseDTO response = missionService.createMission(missionDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Mission>> getAllMissions() {
+    public ResponseEntity<List<MissionResponseDTO>> getAllMissions() {
         return ResponseEntity.ok(missionService.getAllMissions());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMissionById(@PathVariable UUID id) {
+        try {
+            return ResponseEntity.ok(missionService.getMissionById(id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

@@ -1,7 +1,9 @@
 package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.ObservationRequestDTO;
+import com.deepsea.deep_sea.dto.ObservationResponseDTO;
 import com.deepsea.deep_sea.model.Mission;
+import com.deepsea.deep_sea.model.enums.MissionStatus;
 import com.deepsea.deep_sea.model.Observation;
 import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.repository.MissionRepository;
@@ -10,7 +12,9 @@ import com.deepsea.deep_sea.repository.SpeciesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+//import java.util.UUID;
 
 @Service
 public class ObservationService {
@@ -27,33 +31,35 @@ public class ObservationService {
         this.speciesRepository = speciesRepository;
     }
 
-    @Transactional
-    public List<Observation> getAllObservations() {
-        return observationRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<ObservationResponseDTO> getAllObservations() {
+        return observationRepository.findAllWithAssociations().stream()
+                .map(ObservationResponseDTO::fromEntity)
+                .toList();
     }
 
     @Transactional
-    public Observation saveObservation(ObservationRequestDTO dto) {
+    public ObservationResponseDTO saveObservation(ObservationRequestDTO dto) {
         Mission mission = missionRepository.findById(dto.getMissionId())
                 .orElseThrow(() -> new IllegalArgumentException("Target mission does not exist."));
 
-        // Observations can only be logged during live, ongoing operations
-        if (!"ACTIVE".equalsIgnoreCase(mission.getStatus())) {
-            throw new IllegalArgumentException("Cannot log findings. Target mission is currently: " + mission.getStatus());
+        // Use type-safe Enum matching to preserve invariant domain rules
+        if (MissionStatus.ACTIVE != mission.getStatus()) {
+            throw new IllegalStateException("Cannot log findings. Target mission is currently: " + mission.getStatus());
         }
 
-        // Verify Species profile exists
         Species species = speciesRepository.findById(dto.getSpeciesId())
                 .orElseThrow(() -> new IllegalArgumentException("Target biological species taxonomy profile does not exist."));
 
-        // Map DTO fields into the relational Entity entity wrapper
-        Observation observation = new Observation();
-        observation.setDepthMeters(dto.getDepthMeters());
-        observation.setBehaviorNotes(dto.getBehaviorNotes().trim());
-        observation.setObservedAt(dto.getObservedAt() != null ? dto.getObservedAt() : java.time.LocalDateTime.now());
-        observation.setMission(mission);
-        observation.setSpecies(species);
+        Observation observation = Observation.builder()
+                .depthMeters(dto.getDepthMeters())
+                .behaviorNotes(dto.getBehaviorNotes().trim())
+                .observedAt(dto.getObservedAt() != null ? dto.getObservedAt() : LocalDateTime.now())
+                .mission(mission)
+                .species(species)
+                .build();
 
-        return observationRepository.save(observation);
+        Observation savedLog = observationRepository.save(observation);
+        return ObservationResponseDTO.fromEntity(savedLog);
     }
 }

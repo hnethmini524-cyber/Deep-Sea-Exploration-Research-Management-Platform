@@ -1,44 +1,83 @@
 package com.deepsea.deep_sea.service;
 
+import com.deepsea.deep_sea.dto.MissionRequestDTO;
+import com.deepsea.deep_sea.dto.MissionResponseDTO;
 import com.deepsea.deep_sea.model.Mission;
+import com.deepsea.deep_sea.model.ResearchArea;
 import com.deepsea.deep_sea.model.User;
+import com.deepsea.deep_sea.model.enums.MissionStatus;
+import com.deepsea.deep_sea.model.enums.UserRole;
 import com.deepsea.deep_sea.repository.MissionRepository;
+import com.deepsea.deep_sea.repository.ResearchAreaRepository;
 import com.deepsea.deep_sea.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-//import java.util.UUID;
+import java.util.UUID;
 
 @Service
 public class MissionService {
 
     private final MissionRepository missionRepository;
     private final UserRepository userRepository;
+    private final ResearchAreaRepository areaRepository;
 
-    public MissionService(MissionRepository missionRepository, UserRepository userRepository) {
+    public MissionService(MissionRepository missionRepository, 
+                          UserRepository userRepository, 
+                          ResearchAreaRepository areaRepository) {
         this.missionRepository = missionRepository;
         this.userRepository = userRepository;
+        this.areaRepository = areaRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MissionResponseDTO> getAllMissions() {
+        return missionRepository.findAllWithAssociations().stream()
+                .map(MissionResponseDTO::fromEntity)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MissionResponseDTO getMissionById(UUID id) {
+        return missionRepository.findById(id)
+                .map(MissionResponseDTO::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("Mission workspace not found with ID: " + id));
     }
 
     @Transactional
-    public List<Mission> getAllMissions() {
-        return missionRepository.findAll();
-    }
-
-    @Transactional
-    public Mission createMission(Mission mission) {
-        User leader = userRepository.findById(mission.getLeadResearcher().getId())
+    public MissionResponseDTO createMission(MissionRequestDTO dto) {
+    	User leader = userRepository.findById(dto.getLeadResearcherId())
                 .orElseThrow(() -> new IllegalArgumentException("Assigned researcher profile does not exist."));
 
-        if ("PUBLIC".equalsIgnoreCase(leader.getRole())) {
-            throw new IllegalArgumentException("Access Denied: Account type 'PUBLIC' lacks authorization to lead missions.");
+        ResearchArea area = areaRepository.findById(dto.getResearchAreaId())
+                .orElseThrow(() -> new IllegalArgumentException("Target geographical research area does not exist."));
+
+        if (UserRole.PUBLIC == leader.getRole()) {
+            throw new IllegalArgumentException("Access Denied: Account type 'PUBLIC' lacks authorization to lead scientific missions.");
         }
 
-        // Standardize status states
-        mission.setStatus(mission.getStatus().toUpperCase().trim());
-        mission.setCodeName(mission.getCodeName().trim());
+        if (dto.getCompletionDate() != null && dto.getCompletionDate().isBefore(dto.getLaunchDate())) {
+            throw new IllegalArgumentException("Invalid Timeline: Completion date cannot be prior to the launch date.");
+        }
 
-        return missionRepository.save(mission);
+        MissionStatus parsedStatus;
+        try {
+            parsedStatus = MissionStatus.valueOf(dto.getStatus().toUpperCase().trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unsupported mission status state value: " + dto.getStatus());
+        }
+
+        Mission mission = Mission.builder()
+                .codeName(dto.getCodeName().trim())
+                .launchDate(dto.getLaunchDate())
+                .completionDate(dto.getCompletionDate())
+                .status(parsedStatus)
+                .leadResearcher(leader)
+                .researchArea(area)
+                .build();
+
+        Mission savedMission = missionRepository.save(mission);
+        return MissionResponseDTO.fromEntity(savedMission);
     }
 }
-
