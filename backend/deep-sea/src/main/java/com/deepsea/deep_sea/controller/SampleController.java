@@ -25,7 +25,7 @@ public class SampleController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')")
-    public ResponseEntity<?> createSample(@Valid @RequestBody SampleRequestDTO sampleDto) {
+    public ResponseEntity<SampleResponseDTO> createSample(@Valid @RequestBody SampleRequestDTO sampleDto) {
             SampleResponseDTO response = sampleService.createSample(sampleDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -36,7 +36,7 @@ public class SampleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSampleById(@PathVariable UUID id) {
+    public ResponseEntity<SampleResponseDTO> getSampleById(@PathVariable UUID id) {
             return ResponseEntity.ok(sampleService.getSampleById(id));
     }
 }

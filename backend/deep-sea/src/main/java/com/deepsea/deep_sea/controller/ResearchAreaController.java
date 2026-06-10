@@ -25,7 +25,7 @@ public class ResearchAreaController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
-    public ResponseEntity<?> createArea(@Valid @RequestBody ResearchAreaRequestDTO areaDto) {
+    public ResponseEntity<ResearchAreaResponseDTO> createArea(@Valid @RequestBody ResearchAreaRequestDTO areaDto) {
             ResearchAreaResponseDTO response = areaService.createArea(areaDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -36,7 +36,7 @@ public class ResearchAreaController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAreaById(@PathVariable UUID id) {
+    public ResponseEntity<ResearchAreaResponseDTO> getAreaById(@PathVariable UUID id) {
             ResearchAreaResponseDTO response = areaService.getAreaById(id);
             return ResponseEntity.ok(response);
     }

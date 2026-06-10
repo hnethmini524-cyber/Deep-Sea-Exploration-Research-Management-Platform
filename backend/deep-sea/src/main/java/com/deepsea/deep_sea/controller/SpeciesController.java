@@ -25,7 +25,7 @@ public class SpeciesController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") // Enforces security transparently using the application's roles
-    public ResponseEntity<?> addSpecies(@Valid @RequestBody SpeciesRequestDTO speciesDto) {
+    public ResponseEntity<SpeciesResponseDTO> addSpecies(@Valid @RequestBody SpeciesRequestDTO speciesDto) {
             SpeciesResponseDTO response = speciesService.addSpecies(speciesDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -36,7 +36,7 @@ public class SpeciesController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSpeciesById(@PathVariable UUID id) {
+    public ResponseEntity<SpeciesResponseDTO> getSpeciesById(@PathVariable UUID id) {
         	SpeciesResponseDTO response = speciesService.getSpeciesById(id);
             return ResponseEntity.ok(response);
         }

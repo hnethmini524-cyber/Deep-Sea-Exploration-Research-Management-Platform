@@ -24,7 +24,7 @@ public class ObservationController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
-    public ResponseEntity<?> logObservation(@Valid @RequestBody ObservationRequestDTO dto) {
+    public ResponseEntity<ObservationResponseDTO> logObservation(@Valid @RequestBody ObservationRequestDTO dto) {
             ObservationResponseDTO response = observationService.saveObservation(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

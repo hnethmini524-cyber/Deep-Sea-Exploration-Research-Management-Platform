@@ -25,7 +25,7 @@ public class MissionController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')") 
-    public ResponseEntity<?> createMission(@Valid @RequestBody MissionRequestDTO missionDto) {
+    public ResponseEntity<MissionResponseDTO> createMission(@Valid @RequestBody MissionRequestDTO missionDto) {
             MissionResponseDTO response = missionService.createMission(missionDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -36,7 +36,7 @@ public class MissionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMissionById(@PathVariable UUID id) {
+    public ResponseEntity<MissionResponseDTO> getMissionById(@PathVariable UUID id) {
             return ResponseEntity.ok(missionService.getMissionById(id));
         } 
 }
