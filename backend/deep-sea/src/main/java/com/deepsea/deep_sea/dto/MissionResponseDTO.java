@@ -4,6 +4,7 @@ import com.deepsea.deep_sea.model.enums.MissionStatus;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,5 +19,11 @@ public class MissionResponseDTO {
     private String leadResearcherName;
     private UUID researchAreaId;
     private String researchAreaName;
+    private String imageUrl;
+    private List<String> speciesObserved;
+
+    private long totalSamplesLogged;
+
+    private long totalObservationsLogged;
 
 }

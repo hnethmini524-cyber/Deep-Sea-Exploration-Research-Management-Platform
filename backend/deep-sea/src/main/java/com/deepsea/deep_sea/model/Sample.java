@@ -27,6 +27,9 @@ public class Sample {
 
     @Column(length = 1000)
     private String notes;
+    
+    @Column(name = "image_url", length = 512)
+    private String imageUrl; 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id", nullable = false)

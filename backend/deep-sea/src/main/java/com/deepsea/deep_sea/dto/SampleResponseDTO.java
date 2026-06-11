@@ -14,10 +14,12 @@ public class SampleResponseDTO {
     private SampleType type;
     private LocalDateTime collectionDate;
     private String notes;
+    private String imageUrl;
     
     // Connected Mission Context
     private UUID missionId;
     private String missionCodeName;
+    private String missionImageUrl;
     
     // Research Area Context 
     private UUID researchAreaId;

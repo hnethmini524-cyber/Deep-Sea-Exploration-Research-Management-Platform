@@ -21,4 +21,6 @@ public class SpeciesRequestDTO {
 
     @Size(max = 1000)
     private String description;
+    
+    private String imageUrl;
 }

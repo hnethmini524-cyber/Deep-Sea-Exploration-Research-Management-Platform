@@ -32,6 +32,9 @@ public class Species {
     @NotBlank(message = "Marine taxonomy category is required")
     @Column(nullable = false, length = 50)
     private String category; 
+    
+    @Column(name = "image_url", length = 512)
+    private String imageUrl; 
 
     @Column(length = 1000)
     private String description;

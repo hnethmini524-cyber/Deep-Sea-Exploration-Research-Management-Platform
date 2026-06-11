@@ -3,6 +3,8 @@ package com.deepsea.deep_sea.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 import com.deepsea.deep_sea.model.enums.MissionStatus;
 
@@ -26,6 +28,9 @@ public class Mission {
 
     @Column(name = "completion_date")
     private LocalDate completionDate;
+    
+    @Column(name = "image_url", length = 512)
+    private String imageUrl; 
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -42,4 +47,16 @@ public class Mission {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private ResearchArea researchArea;
+    
+    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<Observation> observations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<Sample> samples = new ArrayList<>();
 }

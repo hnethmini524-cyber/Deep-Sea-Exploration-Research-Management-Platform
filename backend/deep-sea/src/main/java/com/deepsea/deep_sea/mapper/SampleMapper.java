@@ -25,6 +25,7 @@ public class SampleMapper {
                 .collectionDate(dto.getCollectionDate() != null ? dto.getCollectionDate() : LocalDateTime.now())
                 .notes(dto.getNotes() != null ? dto.getNotes().trim() : null)
                 .mission(mission)
+                .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
                 .collectedBy(collector)
                 .build();
     }
@@ -35,6 +36,7 @@ public class SampleMapper {
         // Context Null-Safeguards
         UUID missionId = null;
         String missionCodeName = null;
+        String missionImageUrl = null;
         UUID researchAreaId = null;
         String researchAreaName = null;
         String geographicRegion = null;
@@ -43,6 +45,7 @@ public class SampleMapper {
             Mission mission = sample.getMission();
             missionId = mission.getId();
             missionCodeName = mission.getCodeName();
+            missionImageUrl = mission.getImageUrl();
 
             if (mission.getResearchArea() != null) {
                 ResearchArea area = mission.getResearchArea();
@@ -62,7 +65,9 @@ public class SampleMapper {
                 .notes(sample.getNotes())
                 .missionId(missionId)
                 .missionCodeName(missionCodeName)
+                .imageUrl(sample.getImageUrl())
                 .researchAreaId(researchAreaId)
+                .missionImageUrl(missionImageUrl)
                 .researchAreaName(researchAreaName)
                 .geographicRegion(geographicRegion)
                 .collectedById(collectedById)

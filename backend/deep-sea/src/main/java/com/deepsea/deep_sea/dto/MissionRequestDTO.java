@@ -28,4 +28,6 @@ public class MissionRequestDTO {
 
     @NotNull(message = "A target research area ID must be assigned")
     private UUID researchAreaId;
+    
+    private String imageUrl;
 }

@@ -81,6 +81,8 @@ public class MissionService {
                 .leadResearcher(leader)
                 .researchArea(area)
                 .build();
+        
+        Mission missionEntity = missionMapper.toEntity(dto, leader, area, parsedStatus);
 
         Mission savedMission = missionRepository.save(mission);
         return missionMapper.toResponseDTO(savedMission);

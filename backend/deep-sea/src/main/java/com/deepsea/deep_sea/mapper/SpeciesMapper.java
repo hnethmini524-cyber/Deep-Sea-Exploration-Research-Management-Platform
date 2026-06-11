@@ -15,6 +15,7 @@ public class SpeciesMapper {
                 .scientificName(dto.getScientificName().trim())
                 .commonName(dto.getCommonName().trim())
                 .category(dto.getCategory().trim())
+                .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
                 .description(dto.getDescription())
                 .build();
     }
@@ -27,6 +28,7 @@ public class SpeciesMapper {
                 .commonName(species.getCommonName())
                 .scientificName(species.getScientificName())
                 .category(species.getCategory())
+                .imageUrl(species.getImageUrl())
                 .description(species.getDescription())
                 .build();
     }

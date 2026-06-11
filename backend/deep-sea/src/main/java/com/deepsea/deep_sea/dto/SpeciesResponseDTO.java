@@ -13,5 +13,6 @@ public class SpeciesResponseDTO {
     private String scientificName;
     private String category;
     private String description;
+    private String imageUrl;
 
 }

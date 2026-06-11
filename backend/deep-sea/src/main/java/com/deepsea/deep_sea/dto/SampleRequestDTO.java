@@ -24,4 +24,6 @@ public class SampleRequestDTO {
 
     @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String notes;
+    
+    private String imageUrl;
 }
