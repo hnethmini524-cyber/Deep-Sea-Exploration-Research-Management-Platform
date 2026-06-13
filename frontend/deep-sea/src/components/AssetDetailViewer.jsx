@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/asset_detail_viewer.css';
 
 export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
   if (!isOpen || !assetData) return null;
 
+  // Determine context: 'species' | 'sample' | 'mission'
+  const currentContext = assetData.dataType || 'mission';
+
+  // Define dynamic sub-tabs for each separate layout view
+  const getTabsByContext = () => {
+    if (currentContext === 'species' || currentContext === 'sample') {
+      return ['Overview', 'Observations'];
+    }
+    return ['Overview', 'Researchers', 'Species Observed', 'Samples Collected'];
+  };
+
+  const tabs = getTabsByContext();
   const [activeSubTab, setActiveSubTab] = useState('Overview');
 
-  const tabs = ['Overview', 'Researchers', 'Species Observed', 'Samples Collected'];
+  // Reset tab active selection to 'Overview' whenever a new item card opens
+  useEffect(() => {
+    setActiveSubTab('Overview');
+  }, [assetData]);
 
   const renderTabContent = () => {
     switch (activeSubTab) {
       case 'Overview':
-        return <p className="dossier-narrative">{assetData.description || assetData.desc}</p>;
+        return (
+          <p className="dossier-narrative">
+            {assetData.description || assetData.desc || "No comprehensive profile summary registered."}
+          </p>
+        );
+      
+      case 'Observations':
+        return (
+          <div className="dossier-sub-list">
+            <p className="text-info-cyan fw-bold mb-2">✦ Field Operational Record Log:</p>
+            <p className="monospace-text">{assetData.observations || "No real-time environmental data logged."}</p>
+          </div>
+        );
+
       case 'Researchers':
         return (
           <div className="dossier-sub-list">
@@ -23,14 +51,14 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Biological Marine Log:</p>
-            <p className="monospace-text">{assetData.speciesObserved || "Bathypelagic Siphonophore clusters detected near ventilation vents."}</p>
+            <p className="monospace-text">{assetData.speciesObserved || "Bathypelagic Siphonophore clusters detected."}</p>
           </div>
         );
       case 'Samples Collected':
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Ledger Logs:</p>
-            <p className="monospace-text">{assetData.samplesCollected || "Sample-ID #7792: 4.2L Sulfide-rich fluid matrix extraction."}</p>
+            <p className="monospace-text">{assetData.samplesCollected || "Sample-ID #7792: 4.2L Fluid matrix extraction."}</p>
           </div>
         );
       default:
@@ -44,7 +72,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         
         <div className="dossier-header-strip d-flex justify-content-between align-items-center">
           <div className="dossier-pathway-title monospace-text">
-            \\ {assetData.systemCode || "DEEP-SEA-SYSTEM"} \ {assetData.name?.toUpperCase() || assetData.missionName?.toUpperCase()}
+            \\ {currentContext.toUpperCase()} REGISTRY \ {(assetData.missionName || assetData.name || assetData.sampleId)?.toUpperCase()}
           </div>
           <button type="button" className="btn-close-dossier" onClick={onClose}>✕</button>
         </div>
@@ -62,56 +90,121 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
           ))}
         </div>
 
+        {/* Content workspace grid split */}
         <div className="dossier-workspace-split">
           
-          {/* Metadata Grid Ledger */}
           <div className="dossier-text-manifest-pane">
             <div className="narrative-scroller-box">
               {renderTabContent()}
             </div>
 
             <button type="button" className="btn-dossier-download-node monospace-text">
-              &gt; DOWNLOAD TELEMETRY MANIFEST
+              &gt; DOWNLOAD ENVIRONMENTAL TELEMETRY
             </button>
 
-            {/* Technical Metadata Grid Ledger */}
+            {/* Dynamic metadata technical ledger grid */}
             <div className="dossier-metadata-table-wrapper mt-4">
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">ASSET FILE NAME</span>
-                <span className="meta-ledger-value text-truncate">[{assetData.name || assetData.missionName}]</span>
-              </div>
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">DEPLOYMENT REGION</span>
-                <span className="meta-ledger-value">[{assetData.area || assetData.researchArea || "N/A"}]</span>
-              </div>
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">COMMISSION DATE</span>
-                <span className="meta-ledger-value">[{assetData.start || assetData.startDate || "—"}]</span>
-              </div>
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">DECOMMISSION DATE</span>
-                <span className="meta-ledger-value">[{assetData.end || assetData.endDate || "—"}]</span>
-              </div>
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">OPERATIONAL STATUS</span>
-                <span className="meta-ledger-value">[{assetData.status?.toUpperCase() || "PENDING"}]</span>
-              </div>
-              <div className="meta-ledger-row">
-                <span className="meta-ledger-key">COMPLETION SCALE</span>
-                <span className="meta-ledger-value">[{assetData.completion || "0"}%]</span>
-              </div>
+              
+              {/* === Layout for mission page */}
+              {currentContext === 'mission' && (
+                <>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">MISSION NAME</span>
+                    <span className="meta-ledger-value text-truncate">
+                      [{assetData.missionName || assetData.name || "—"}]
+                    </span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">START DATE</span>
+                    <span className="meta-ledger-value">
+                      [{assetData.startDate || assetData.start || "—"}]
+                    </span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">END DATE</span>
+                    <span className="meta-ledger-value">
+                      [{assetData.endDate || assetData.end || "—"}]
+                    </span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">STATUS</span>
+                    <span className="meta-ledger-value text-info fw-bold">
+                      [{(assetData.status || "PENDING").toUpperCase()}]
+                    </span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">RESEARCH AREA</span>
+                    <span className="meta-ledger-value text-warning fw-bold">
+                      [{assetData.researchArea || assetData.area || "—"}]
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* === Layout for species === */}
+              {currentContext === 'species' && (
+                <>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">COMMON PROFILE NAME</span>
+                    <span className="meta-ledger-value text-truncate">[{assetData.name}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">SCIENTIFIC NOMENCLATURE</span>
+                    <span className="meta-ledger-value">[{assetData.scientificName || "N/A"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">OPERATION MISSION</span>
+                    <span className="meta-ledger-value text-info">[{assetData.missionName || "N/A"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
+                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0m"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">TAXONOMIC CATEGORY</span>
+                    <span className="meta-ledger-value">[{assetData.category || "Unclassified"}]</span>
+                  </div>
+                </>
+              )}
+
+              {/* === Layout for samples === */}
+              {currentContext === 'sample' && (
+                <>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">CORE SAMPLE ID</span>
+                    <span className="meta-ledger-value text-truncate">[{assetData.sampleId}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">MATERIAL CLASSIFICATION</span>
+                    <span className="meta-ledger-value">[{assetData.name || "Raw Core"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">OPERATION MISSION</span>
+                    <span className="meta-ledger-value text-info">[{assetData.missionName || "N/A"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
+                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0m"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">COLLECTION DATE STAMP</span>
+                    <span className="meta-ledger-value">[{assetData.date || "—"}]</span>
+                  </div>
+                </>
+              )}
+
             </div>
           </div>
 
-          {/* Main Imagery/Telemetry Graphic Screen */}
+          {/* Graphic display viewscreen */}
           <div className="dossier-imagery-visualization-pane">
             <div className="dossier-image-frame-container">
               <img 
                 src={assetData.imageUrl || "https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&w=1000&q=80"} 
-                alt="Sub-surface operational visualization sonar chart data" 
+                alt="Operational telemetry visual capture" 
                 className="dossier-main-display-graphic"
               />
-              <div className="dossier-image-stamp-watermark monospace-text">SECRET</div>
+              <div className="dossier-image-stamp-watermark monospace-text">SECURED RECORD</div>
             </div>
           </div>
 

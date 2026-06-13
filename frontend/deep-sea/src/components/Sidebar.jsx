@@ -14,8 +14,7 @@ const MENU_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'missions', label: 'Missions Search', icon: Compass },
   { id: 'researchers', label: 'Researchers ', icon: Users },
-  { id: 'species', label: 'Species Catalog', icon: Waves },
-  { id: 'samples', label: 'Sample Ledger', icon: Beaker },
+  { id: 'species', label: 'Observations', icon: Waves },
   { id: 'areas', label: 'Research Areas', icon: Map },
   { id: 'about', label: 'System Info', icon: Info },
 ];

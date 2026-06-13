@@ -3,7 +3,7 @@ import Pagination from '../components/Pagination';
 import AssetDetailViewer from '../components/AssetDetailViewer';
 import '../styles/missions_page.css';
 
-// --- MOCK EXTENDED OCEANIC DATA ARRAY MATRIX ---
+// --- Mock data ---
 const EXTENDED_MOCK_MISSIONS = [
   { id: 1, name: 'Chakra Soft UI Version', desc: 'Deep sea diagnostic check on core UI framework elements.', start: '2026-01-10', end: '2026-02-15', status: 'Working', area: 'ZONE-A1', completion: 60 },
   { id: 2, name: 'Add Progress Track', desc: 'Integrating continuous telemetry mapping for abyssal tools.', start: '2026-02-18', end: '2026-03-01', status: 'Canceled', area: 'ZONE-B4', completion: 10 },
@@ -30,24 +30,22 @@ export default function MissionsPage() {
     m.area.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination processing allocations
+  // Pagination processing
   const totalPages = Math.ceil(filteredMissions.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredMissions.slice(indexOfFirstRow, indexOfLastRow);
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case 'Done': return 'status-badge done-glow';
-      case 'Working': return 'status-badge working-glow';
-      case 'Canceled': return 'status-badge canceled-glow';
-      default: return 'status-badge';
-    }
-  };
-
-  // Trigger modal function
+  // Trigger modal function with data normalization context wrapper
   const handleRowSelection = (mission) => {
-    setSelectedMission(mission);
+    setSelectedMission({
+      ...mission,
+      dataType: 'mission',
+      missionName: mission.name,
+      startDate: mission.start,
+      endDate: mission.end,
+      researchArea: mission.area
+    });
     setIsDossierOpen(true);
   };
 
@@ -100,16 +98,16 @@ export default function MissionsPage() {
                     <td className="table-body-cell text-muted">{mission.end}</td>
                     <td className="table-body-cell">
                       <span className={`status-badge ${mission.status === 'Done' ? 'done-glow' : mission.status === 'Canceled' ? 'canceled-glow' : 'working-glow'}`}>
-                      {mission.status}
-                    </span>
+                        {mission.status}
+                      </span>
                     </td>
                     <td className="table-body-cell text-info fw-bold">{mission.area}</td>
                     <td className="table-body-cell text-center" onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      type="button" 
-                      className="btn-assign-researcher-node"
-                      onClick={() => handleRowSelection(mission)}
-                    >
+                      <button 
+                        type="button" 
+                        className="btn-assign-researcher-node"
+                        onClick={() => handleRowSelection(mission)}
+                      >
                         View
                       </button>
                     </td>
@@ -126,7 +124,7 @@ export default function MissionsPage() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination block */}
         {totalPages > 1 && (
           <Pagination 
             currentPage={currentPage}
