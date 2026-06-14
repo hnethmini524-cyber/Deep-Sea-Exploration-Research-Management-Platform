@@ -29,6 +29,7 @@ const MOCK_AREAS = [
     samplesCollected: "SMP-903 (Abyssal Brine Matrix).",
     imageUrl: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?auto=format&fit=crop&w=1000&q=80"
   }
+
 ];
 
 export default function ResearchAreasPage() {

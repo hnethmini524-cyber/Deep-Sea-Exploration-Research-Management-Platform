@@ -2,6 +2,16 @@
   padding: 24px;
   background-color: #030712; 
   min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.areas-page-container {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
 }
 
 .section-main-heading {
