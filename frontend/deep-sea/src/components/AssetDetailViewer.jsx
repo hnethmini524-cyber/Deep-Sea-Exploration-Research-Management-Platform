@@ -4,21 +4,27 @@ import '../styles/asset_detail_viewer.css';
 export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
   if (!isOpen || !assetData) return null;
 
-  // Determine context: 'species' | 'sample' | 'mission'
+  // Determine context configuration: 'species' | 'sample' | 'mission' | 'research_area'
   const currentContext = assetData.dataType || 'mission';
 
-  // Define dynamic sub-tabs for each separate layout view
+  // Define dynamic navigation tabs for each domain registry view
   const getTabsByContext = () => {
-    if (currentContext === 'species' || currentContext === 'sample') {
-      return ['Overview', 'Observations'];
+    switch (currentContext) {
+      case 'species':
+      case 'sample':
+        return ['Overview', 'Observations'];
+      case 'research_area':
+        return ['Overview', 'Missions', 'Species Found', 'Samples Collected'];
+      case 'mission':
+      default:
+        return ['Overview', 'Researchers', 'Species Observed', 'Samples Collected'];
     }
-    return ['Overview', 'Researchers', 'Species Observed', 'Samples Collected'];
   };
 
   const tabs = getTabsByContext();
   const [activeSubTab, setActiveSubTab] = useState('Overview');
 
-  // Reset tab active selection to 'Overview' whenever a new item card opens
+  // Reset tab active selection back to 'Overview' whenever a new item state maps in
   useEffect(() => {
     setActiveSubTab('Overview');
   }, [assetData]);
@@ -28,7 +34,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Overview':
         return (
           <p className="dossier-narrative">
-            {assetData.description || assetData.desc || "No comprehensive profile summary registered."}
+            {assetData.description || assetData.desc || "No comprehensive profile summary registered inside the active matrix configuration."}
           </p>
         );
       
@@ -36,7 +42,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Field Operational Record Log:</p>
-            <p className="monospace-text">{assetData.observations || "No real-time environmental data logged."}</p>
+            <p className="monospace-text">{assetData.observations || "No real-time environmental telemetry data logged."}</p>
           </div>
         );
 
@@ -47,20 +53,32 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             <p className="monospace-text">{assetData.assignedResearcher || "Dr. Alan Watson (Lead Hydro-Biologist)"}</p>
           </div>
         );
+
       case 'Species Observed':
+      case 'Species Found':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Biological Marine Log:</p>
-            <p className="monospace-text">{assetData.speciesObserved || "Bathypelagic Siphonophore clusters detected."}</p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Biological Taxa Log Matrix:</p>
+            <p className="monospace-text">{assetData.speciesObserved || assetData.speciesFound || "Bathypelagic Siphonophore clusters detected inside proximity bounds."}</p>
           </div>
         );
+
       case 'Samples Collected':
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Ledger Logs:</p>
-            <p className="monospace-text">{assetData.samplesCollected || "Sample-ID #7792: 4.2L Fluid matrix extraction."}</p>
+            <p className="monospace-text">{assetData.samplesCollected || "Sample-ID #7792: 4.2L Fluid environmental matrix extraction."}</p>
           </div>
         );
+
+      case 'Missions':
+        return (
+          <div className="dossier-sub-list">
+            <p className="text-info-cyan fw-bold mb-2">✦ Associated Tactical Deployments:</p>
+            <p className="monospace-text">{assetData.missions || "Operation Trench Run, Bathymetric Sonar Topography Sweep Phase 1."}</p>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -70,13 +88,15 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
     <div className="asset-dossier-overlay-backdrop">
       <div className="asset-dossier-master-card">
         
+        {/* Top header pathway */}
         <div className="dossier-header-strip d-flex justify-content-between align-items-center">
           <div className="dossier-pathway-title monospace-text">
-            \\ {currentContext.toUpperCase()} REGISTRY \ {(assetData.missionName || assetData.name || assetData.sampleId)?.toUpperCase()}
+            \\ {currentContext.replace('_', ' ').toUpperCase()} REGISTRY \ {(assetData.missionName || assetData.name || assetData.sampleId || assetData.areaName)?.toUpperCase()}
           </div>
           <button type="button" className="btn-close-dossier" onClick={onClose}>✕</button>
         </div>
 
+        {/* Tab navigation menu option */}
         <div className="dossier-tab-navigation-bar">
           {tabs.map((tab) => (
             <button
@@ -105,7 +125,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             {/* Dynamic metadata technical ledger grid */}
             <div className="dossier-metadata-table-wrapper mt-4">
               
-              {/* === Layout for mission page */}
+              {/* === Layout for missions === */}
               {currentContext === 'mission' && (
                 <>
                   <div className="meta-ledger-row">
@@ -189,6 +209,28 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">COLLECTION DATE STAMP</span>
                     <span className="meta-ledger-value">[{assetData.date || "—"}]</span>
+                  </div>
+                </>
+              )}
+
+              {/* === Layout for research areas === */}
+              {currentContext === 'research_area' && (
+                <>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">AREA NAME</span>
+                    <span className="meta-ledger-value text-truncate">[{assetData.areaName || assetData.name || "—"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">GEOGRAPHIC REGION</span>
+                    <span className="meta-ledger-value">[{assetData.region || "—"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">TARGET GPS COORDINATES</span>
+                    <span className="meta-ledger-value text-info monospace-text">[{assetData.coordinates || "0.000° N, 0.000° E"}]</span>
+                  </div>
+                  <div className="meta-ledger-row">
+                    <span className="meta-ledger-key">ACTIVE MISSIONS DEPLOYED</span>
+                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.activeMissionsCount || 0}]</span>
                   </div>
                 </>
               )}

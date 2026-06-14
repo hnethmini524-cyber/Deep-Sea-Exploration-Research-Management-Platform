@@ -9,6 +9,8 @@
 @import './styles/missions_page.css';
 @import './styles/asset_detail_viewer.css';
 
+@import './styles/research_areas_page.css';
+
 * {
   margin: 0;
   padding: 0;

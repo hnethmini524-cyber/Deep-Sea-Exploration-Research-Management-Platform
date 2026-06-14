@@ -2,13 +2,13 @@ import { useState } from 'react'
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import './index.css'
-import ObservationPage from './pages/ObservationPage';
+import ResearchAreasPage from './pages/ResearchAreasPage';
 
 function App() {
   return (
     <main className="app-root-container">
       <Sidebar />
-      <ObservationPage />
+      <ResearchAreasPage />
     </main>
   );
 }
