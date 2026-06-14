@@ -1,6 +1,7 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 @import "./styles/sidebar.css";
+@import "./styles/navbar.css";
 @import './styles/banner.css';
 @import './styles/mission_table.css';
 @import './styles/dashboard.css';
@@ -22,14 +23,30 @@ body, html {
   height: 100%;
   background-color: #060b28;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  overflow: hidden; /* Drops double scroll container sidebars */
+  overflow: hidden;
 }
 
-/* Master row layout container */
 .app-root-container {
   display: flex;
   width: 100vw;
   height: 100vh;
   background-color: #060b28;
   overflow: hidden;
+  flex: 1;
+}
+
+.app-layout-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #030712;
+}
+
+.app-content-viewport {
+  flex: 1;
+  overflow-y: auto; 
+  background-color: #030712;
+  position: relative;
 }

@@ -1,34 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Compass, 
   Users, 
   Waves, 
-  Beaker, 
   Map, 
   Info 
 } from 'lucide-react';
+import '../styles/sidebar.css';
 
-// --- System navigations ---
+// System navigations mapping to matches defined in App.jsx routing paths
 const MENU_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'missions', label: 'Missions Search', icon: Compass },
-  { id: 'researchers', label: 'Researchers ', icon: Users },
-  { id: 'species', label: 'Observations', icon: Waves },
-  { id: 'areas', label: 'Research Areas', icon: Map },
-  { id: 'about', label: 'System Info', icon: Info },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { id: 'missions', label: 'Missions Search', icon: Compass, path: '/missions' },
+  { id: 'researchers', label: 'Researchers', icon: Users, path: '/researchers' },
+  { id: 'observations', label: 'Observations', icon: Waves, path: '/observations' },
+  { id: 'areas', label: 'Research Areas', icon: Map, path: '/research-areas' }, // Path match key
+  { id: 'about', label: 'System Info', icon: Info, path: '/about' },
 ];
 
-export default function Sidebar({ currentActivePage, onPageChange }) {
-  const [activeItem, setActiveItem] = useState(currentActivePage || 'dashboard');
-
-  const handleNavigation = (id) => {
-    setActiveItem(id);
-    if (onPageChange) {
-      onPageChange(id);
-    }
-  };
-
+export default function Sidebar() {
   return (
     <aside className="sidebar-container">
       
@@ -44,29 +36,36 @@ export default function Sidebar({ currentActivePage, onPageChange }) {
       <nav className="nav-menu">
         {MENU_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = activeItem === item.id;
 
           return (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => handleNavigation(item.id)}
-              className={`nav-link-button ${isActive ? 'active' : ''}`}
+              to={item.path}
+              /* We destruct isActive from NavLink's inner render state 
+                to dynamically append your existing .active CSS class properties.
+              */
+              className={({ isActive }) => `nav-link-button ${isActive ? 'active' : ''}`}
             >
-              <div className="icon-flex-wrapper">
-                <Icon 
-                  size={18} 
-                  color={isActive ? '#fff' : 'rgba(255, 255, 255, 0.65)'} 
-                  style={{ transition: 'color 0.2s ease' }}
-                />
-              </div>
-              <span className="link-text">
-                {item.label}
-              </span>
-            </button>
+              {({ isActive }) => (
+                <>
+                  <div className="icon-flex-wrapper">
+                    <Icon 
+                      size={18} 
+                      color={isActive ? '#fff' : 'rgba(255, 255, 255, 0.65)'} 
+                      style={{ transition: 'color 0.2s ease' }}
+                    />
+                  </div>
+                  <span className="link-text">
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </NavLink>
           );
         })}
       </nav>
 
+      {/* --- Footer Container --- */}
       <div className="footer-container">
         <p className="footer-text">
           Powered by Deep-Sea <br />
