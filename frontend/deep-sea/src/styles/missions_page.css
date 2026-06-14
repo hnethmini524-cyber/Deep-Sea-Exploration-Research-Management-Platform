@@ -157,3 +157,126 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+/* ==========================================================================
+   RESEARCHER REGISTRY VIEWPORT ISOLATION SCOPE (Dropdown Overrides Only)
+   ========================================================================== */
+
+/* 1. CRITICAL: Break the container cage to let elements float outward */
+.researcher-page-scope .table-responsive {
+  overflow: visible !important; /* Forces layout to render past column bounds */
+}
+
+.researcher-page-scope .glass-panel-card {
+  overflow: visible !important; /* Prevents card borders from clipping the drawer */
+}
+
+.researcher-page-scope .tabular-element {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Ensure the specific table cell also permits overflow drawing */
+.researcher-page-scope .visual-dropdown-overflow-cell {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* 2. Micro-Container Framework Layer */
+.researcher-page-scope .inline-mission-dropdown-cell {
+  position: relative;
+  display: inline-block;
+}
+
+/* 3. Styled Interactive Cell Trigger Badge Link */
+.researcher-page-scope .btn-mission-cell-trigger {
+  background-color: rgba(6, 11, 40, 0.6);
+  border: 1px solid rgba(26, 35, 90, 0.8);
+  color: #38bdf8;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.researcher-page-scope .btn-mission-cell-trigger:hover,
+.researcher-page-scope .btn-mission-cell-trigger.active-trigger {
+  border-color: #0075ff;
+  background-color: #060b28;
+  box-shadow: 0 0 10px rgba(0, 117, 255, 0.3);
+}
+
+.researcher-page-scope .badge-mission-count {
+  background-color: rgba(0, 117, 255, 0.15);
+  color: #00f2fe;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+/* 4. Floating Cyber Dropdown List Menu Box Drawer */
+.researcher-page-scope .cell-missions-floating-portal {
+  position: absolute;
+  top: calc(100% + 8px); /* Shift down slightly from row text line */
+  left: auto;
+  right: 0;             /* Align flush to the right so it stays within screen bounds */
+  width: 220px;
+  background-color: #060b28 !important; /* Solid dark color to mask underlying rows */
+  border: 1px solid #1a235a;
+  border-radius: 10px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 117, 255, 0.2);
+  padding: 12px;
+  
+  /* CRITICAL: Must be exceptionally high to clear all neighboring table rows safely */
+  z-index: 9999 !important; 
+  animation: researcherCellFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes researcherCellFadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.researcher-page-scope .portal-headline {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding-left: 4px;
+  letter-spacing: 0.5px;
+}
+
+.researcher-page-scope .portal-items-list-pane {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* 5. Line-by-Line List Row Structure Items */
+.researcher-page-scope .portal-mission-row {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.researcher-page-scope .portal-mission-row:hover {
+  background-color: rgba(0, 117, 255, 0.08);
+  border-color: rgba(0, 117, 255, 0.2);
+}
