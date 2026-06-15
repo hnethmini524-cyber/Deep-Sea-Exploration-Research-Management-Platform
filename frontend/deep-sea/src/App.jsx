@@ -11,6 +11,7 @@ import ResearcherPage from './pages/ResearcherPage';
 import ObservationPage from './pages/ObservationPage';
 import ProfilePage from './pages/ProfilePage';
 import PasswordSetPage from './pages/PasswordSetPage';
+import SystemInfoPage from './pages/SystemInfoPage';
 import './index.css';
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="/research-areas" element={<ResearchAreasPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/password" element={<PasswordSetPage />} />
+            <Route path="/info" element={<SystemInfoPage />} />
             
             {/* Authentication Routes */}
             <Route path="/signin" element={<SignInPage />} />

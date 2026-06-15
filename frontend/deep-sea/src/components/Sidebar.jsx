@@ -10,14 +10,13 @@ import {
 } from 'lucide-react';
 import '../styles/sidebar.css';
 
-// System navigations mapping to matches defined in App.jsx routing paths
 const MENU_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { id: 'missions', label: 'Missions Search', icon: Compass, path: '/missions' },
   { id: 'researchers', label: 'Researchers', icon: Users, path: '/researchers' },
   { id: 'observations', label: 'Observations', icon: Waves, path: '/observations' },
   { id: 'areas', label: 'Research Areas', icon: Map, path: '/research-areas' },
-  { id: 'about', label: 'System Info', icon: Info, path: '/about' },
+  { id: 'about', label: 'System Info', icon: Info, path: '/info' },
 ];
 
 export default function Sidebar() {
@@ -41,9 +40,6 @@ export default function Sidebar() {
             <NavLink
               key={item.id}
               to={item.path}
-              /* We destruct isActive from NavLink's inner render state 
-                to dynamically append your existing .active CSS class properties.
-              */
               className={({ isActive }) => `nav-link-button ${isActive ? 'active' : ''}`}
             >
               {({ isActive }) => (

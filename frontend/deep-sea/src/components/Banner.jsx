@@ -33,16 +33,9 @@ export default function MissionHeroBanner({ onCreateMissionClick, onExportReport
             onClick={onCreateMissionClick} 
             className="btn-banner-primary"
           >
-            Launch Operation <span className="ms-2">→</span>
+            Launch Mission <span className="ms-2">→</span>
           </button>
           
-          <button 
-            onClick={onExportReportClick} 
-            className="btn-banner-secondary d-inline-flex align-items-center"
-          >
-            <FileBarChart2 size={16} className="me-2" />
-            Generate Telemetry Report
-          </button>
         </div>
 
       </div>
