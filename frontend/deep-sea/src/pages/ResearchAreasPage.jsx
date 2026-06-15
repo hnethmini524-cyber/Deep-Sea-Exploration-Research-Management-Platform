@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import AssetDetailViewer from '../components/AssetDetailViewer';
 import Pagination from '../components/Pagination'; 
+import UnifiedRegistryForm from '../components/UnifiedRegistryForm';
+import { FORM_SCHEMAS } from '../formSchemas';
 import '../styles/research_areas_page.css';
 
-// Mock data array 
 const MOCK_AREAS = [
   {
     id: "AREA-01",
@@ -29,7 +30,6 @@ const MOCK_AREAS = [
     samplesCollected: "SMP-903 (Abyssal Brine Matrix).",
     imageUrl: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?auto=format&fit=crop&w=1000&q=80"
   }
-
 ];
 
 export default function ResearchAreasPage() {
@@ -37,6 +37,8 @@ export default function ResearchAreasPage() {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
   
   // Pagination Config
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,12 +57,31 @@ export default function ResearchAreasPage() {
     setIsDossierOpen(true);
   };
 
+  // Process incoming dynamic fields down to list elements state arrays
+  const handleCreateAreaSubmit = (formData) => {
+    const generatedIdNum = researchAreas.length + 1;
+    const newAreaNode = {
+      id: `AREA-${generatedIdNum < 10 ? '0' + generatedIdNum : generatedIdNum}`,
+      name: formData.areaName || 'Unspecified Sector Node',
+      region: formData.region || 'Unknown Waters Coordinates',
+      coordinates: formData.coordinates || '0.0000° N, 0.0000° E',
+      description: formData.description || 'No baseline environmental telemetry logs entered.',
+      activeMissionsCount: formData.activeMissions ? (Array.isArray(formData.activeMissions) ? formData.activeMissions.length : 1) : 0,
+      missions: Array.isArray(formData.activeMissions) ? formData.activeMissions.join(', ') : (formData.activeMissions || 'Independent Ops'),
+      speciesFound: Array.isArray(formData.speciesObserved) ? formData.speciesObserved.join(', ') : 'None Documented',
+      samplesCollected: Array.isArray(formData.samplesCollected) ? formData.samplesCollected.join(', ') : 'None Contained',
+      imageUrl: formData.image ? URL.createObjectURL(formData.image) : "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?auto=format&fit=crop&w=1000&q=80"
+    };
+
+    setResearchAreas([newAreaNode, ...researchAreas]);
+    setIsFormOpen(false);
+  };
+
   const filteredAreas = researchAreas.filter(area => 
     area.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     area.region.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination Computations
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredAreas.slice(indexOfFirstItem, indexOfLastItem);
@@ -84,10 +105,14 @@ export default function ResearchAreasPage() {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset page on filter change
+                setCurrentPage(1); 
               }}
             />
-            <button type="button" className="btn-add-new-node monospace-text">
+            <button 
+              type="button" 
+              className="btn-add-new-node monospace-text"
+              onClick={() => setIsFormOpen(true)}
+            >
               ADD A NEW AREA
             </button>
           </div>
@@ -138,11 +163,11 @@ export default function ResearchAreasPage() {
         </div>
 
         {totalPages > 1 && (
-            <Pagination
+          <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={(pageNum) => setCurrentPage(pageNum)}
-            />
+          />
         )}
 
       </div>
@@ -155,6 +180,19 @@ export default function ResearchAreasPage() {
         }}
         assetData={selectedAsset}
       />
+
+      {isFormOpen && (
+        <UnifiedRegistryForm 
+          headline="RESEARCH_AREA"
+          schema={
+            Array.isArray(FORM_SCHEMAS?.AREA)
+              ? FORM_SCHEMAS.AREA
+              : FORM_SCHEMAS?.AREA?.fields || []
+          }
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleCreateAreaSubmit}
+        />
+      )}
     </div>
   );
 }

@@ -158,17 +158,14 @@
   text-overflow: ellipsis !important;
 }
 
-/* ==========================================================================
-   RESEARCHER REGISTRY VIEWPORT ISOLATION SCOPE (Dropdown Overrides Only)
-   ========================================================================== */
+/* Researcher registry viewport */
 
-/* 1. CRITICAL: Break the container cage to let elements float outward */
 .researcher-page-scope .table-responsive {
-  overflow: visible !important; /* Forces layout to render past column bounds */
+  overflow: visible !important;
 }
 
 .researcher-page-scope .glass-panel-card {
-  overflow: visible !important; /* Prevents card borders from clipping the drawer */
+  overflow: visible !important;
 }
 
 .researcher-page-scope .tabular-element {
@@ -176,19 +173,16 @@
   overflow: visible !important;
 }
 
-/* Ensure the specific table cell also permits overflow drawing */
 .researcher-page-scope .visual-dropdown-overflow-cell {
   position: relative;
   overflow: visible !important;
 }
 
-/* 2. Micro-Container Framework Layer */
 .researcher-page-scope .inline-mission-dropdown-cell {
   position: relative;
   display: inline-block;
 }
 
-/* 3. Styled Interactive Cell Trigger Badge Link */
 .researcher-page-scope .btn-mission-cell-trigger {
   background-color: rgba(6, 11, 40, 0.6);
   border: 1px solid rgba(26, 35, 90, 0.8);
@@ -221,20 +215,17 @@
   font-weight: 800;
 }
 
-/* 4. Floating Cyber Dropdown List Menu Box Drawer */
 .researcher-page-scope .cell-missions-floating-portal {
   position: absolute;
-  top: calc(100% + 8px); /* Shift down slightly from row text line */
+  top: calc(100% + 8px); 
   left: auto;
-  right: 0;             /* Align flush to the right so it stays within screen bounds */
+  right: 0;      
   width: 220px;
-  background-color: #060b28 !important; /* Solid dark color to mask underlying rows */
+  background-color: #060b28 !important; 
   border: 1px solid #1a235a;
   border-radius: 10px;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 117, 255, 0.2);
   padding: 12px;
-  
-  /* CRITICAL: Must be exceptionally high to clear all neighboring table rows safely */
   z-index: 9999 !important; 
   animation: researcherCellFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -264,7 +255,6 @@
   overflow-y: auto;
 }
 
-/* 5. Line-by-Line List Row Structure Items */
 .researcher-page-scope .portal-mission-row {
   display: flex;
   align-items: center;
@@ -280,3 +270,40 @@
   background-color: rgba(0, 117, 255, 0.08);
   border-color: rgba(0, 117, 255, 0.2);
 }
+
+.profile-drawer-backdrop {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(3, 7, 26, 0.85); 
+  z-index: 1050 !important; 
+  display: flex !important;
+  justify-content: flex-end; 
+}
+
+.profile-drawer-box {
+  position: relative;
+  width: 450px;
+  height: 100%;
+  background: #060b28; 
+  border-left: 1px solid rgba(0, 180, 216, 0.2);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; 
+}
+
+.multiselect-node-item {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.multiselect-node-item:checked,
+.multiselect-node-item:hover {
+  background: rgba(0, 180, 216, 0.15) !important; 
+  color: #00b4d8 !important; 
+}
+

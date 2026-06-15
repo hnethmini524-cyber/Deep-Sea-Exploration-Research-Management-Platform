@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp, Terminal } from 'lucide-react';
 import Pagination from '../components/Pagination';
-import '../styles/missions_page.css'; // Keeps original styles active
+import UnifiedRegistryForm from '../components/UnifiedRegistryForm';
+import { FORM_SCHEMAS } from '../formSchemas';
+import '../styles/missions_page.css'; 
 
-// --- MOCK EXTENDED OCEANIC DATA ARRAY MATRIX ---
 const EXTENDED_MOCK_MISSIONS = [
   { id: 1, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-A1'},
   { id: 2, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-B4'},
@@ -17,7 +18,6 @@ const EXTENDED_MOCK_MISSIONS = [
   { id: 10, name: 'Alan Watson', email: 'alan@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-D1'}
 ];
 
-// --- SELF-CONTAINED INLINE DROPDOWN CELL COMPONENT ---
 function MissionsDropdownCell({ missions }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -68,22 +68,55 @@ function MissionsDropdownCell({ missions }) {
   );
 }
 
-// --- MAIN PAGE VIEW COMPONENT ---
 export default function ResearcherPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [researchersRawList, setResearchersRawList] = useState(EXTENDED_MOCK_MISSIONS);
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const rowsPerPage = 5;
 
-  // STEP A: Dynamically group rows by email to transform flat items into distinct researchers
+  const handleCreateResearcherSubmit = (formData) => {
+    const commonBaseId = Date.now();
+    const assignedMissionsArray = formData.assignedMissions || [];
+    
+    // Create rows for each assigned track to match the reduction engine parsing
+    if (assignedMissionsArray.length === 0) {
+      const fallbackRow = {
+        id: commonBaseId,
+        name: formData.researcherName || 'Anonymous Operator',
+        email: formData.email || 'unknown@domain.com',
+        speacial: formData.specialization || 'General Systems',
+        role: formData.role || 'Unassigned Field Asset',
+        institution: formData.institution || 'Independent Agent',
+        assigns: 'CORE-SYS'
+      };
+      setResearchersRawList([fallbackRow, ...researchersRawList]);
+    } else {
+      const generatedRows = assignedMissionsArray.map((missionCode, index) => ({
+        id: commonBaseId + index,
+        name: formData.researcherName || 'Anonymous Operator',
+        email: formData.email || 'unknown@domain.com',
+        speacial: formData.specialization || 'General Systems',
+        role: formData.role || 'Unassigned Field Asset',
+        institution: formData.institution || 'Independent Agent',
+        assigns: missionCode
+      }));
+      setResearchersRawList([...generatedRows, ...researchersRawList]);
+    }
+
+    setIsFormOpen(false);
+  };
+
   const groupedResearchers = Object.values(
-    EXTENDED_MOCK_MISSIONS.reduce((acc, current) => {
+    researchersRawList.reduce((acc, current) => {
       if (!acc[current.email]) {
         acc[current.email] = {
           ...current,
-          missionsArray: [current.assigns] // Initialize tracking array
+          missionsArray: [current.assigns]
         };
       } else {
-        // If the researcher profile exists, push the additional mission track sequentially
         if (!acc[current.email].missionsArray.includes(current.assigns)) {
           acc[current.email].missionsArray.push(current.assigns);
         }
@@ -92,20 +125,17 @@ export default function ResearcherPage() {
     }, {})
   );
 
-  // STEP B: Run filters against the grouped researcher entities
   const filteredResearchers = groupedResearchers.filter(r =>
     r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.missionsArray.some(m => m.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // STEP C: Compute pagination configurations
   const totalPages = Math.ceil(filteredResearchers.length / rowsPerPage);
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = filteredResearchers.slice(indexOfFirstRow, indexOfLastRow);
 
   return (
-    /* Scoped layout parent element wrapper to protect your existing CSS */
     <div className="missions-registry-viewport researcher-page-scope">
       
       <div className="registry-top-utility-bar d-flex justify-content-between align-items-center mb-4">
@@ -118,7 +148,11 @@ export default function ResearcherPage() {
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
           />
         </div>
-        <button type="button" className="btn-add-action-node">
+        <button 
+          type="button" 
+          className="btn-add-action-node" 
+          onClick={() => setIsFormOpen(true)}
+        >
           Add New Researcher
         </button>
       </div>
@@ -153,7 +187,6 @@ export default function ResearcherPage() {
                     <td className="table-body-cell text-muted">{researcher.role}</td>
                     <td className="table-body-cell text-info fw-bold">{researcher.institution}</td>
                     
-                    {/* Integrated cell dropdown portal component */}
                     <td className="table-body-cell visual-dropdown-overflow-cell">
                       <MissionsDropdownCell missions={researcher.missionsArray} />
                     </td>
@@ -170,7 +203,6 @@ export default function ResearcherPage() {
           </table>
         </div>
 
-        {/* Pagination Engine Component Hook */}
         {totalPages > 1 && (
           <Pagination 
             currentPage={currentPage}
@@ -179,6 +211,15 @@ export default function ResearcherPage() {
           />
         )}
       </div>
+
+      {isFormOpen && (
+        <UnifiedRegistryForm 
+          headline="RESEARCHER_RECORD"
+          schema={FORM_SCHEMAS.RESEARCHER}
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleCreateResearcherSubmit}
+        />
+      )}
 
     </div>
   );

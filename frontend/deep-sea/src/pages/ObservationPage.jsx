@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Pagination from '../components/Pagination';
 import AssetDetailViewer from '../components/AssetDetailViewer';
+import UnifiedRegistryForm from '../components/UnifiedRegistryForm';
+import { FORM_SCHEMAS } from '../formSchemas';
 import '../styles/missions_page.css'; 
 
 const INITIAL_SPECIES = [
@@ -63,6 +65,9 @@ export default function ObservationPage() {
   
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formConfig, setFormConfig] = useState({ headline: '', schema: [], type: '' });
 
   const rowsPerPage = 5;
 
@@ -75,51 +80,70 @@ export default function ObservationPage() {
   const handleRowClick = (item, entityType) => {
     const completeAssetPayload = {
       ...item,
-      dataType: entityType // Explicit binding identifier route: 'species' | 'sample'
+      dataType: entityType
     };
     setSelectedAsset(completeAssetPayload);
     setIsViewerOpen(true);
   };
 
-  const handleAddNewSpecies = () => {
-    const name = prompt("Enter Species Common Name:");
-    if (!name) return;
-    const newEntry = {
-      id: Date.now(),
-      name,
-      scientificName: prompt("Enter Scientific Name:") || 'Unknown sp.',
-      category: prompt("Enter Category:") || 'Unclassified',
-      depth: prompt("Enter Operating Depth:") || '0m',
-      desc: prompt("Enter Description Summary:") || 'No baseline telemetry data registered.',
-      missionName: prompt("Enter Assigned Mission Context:") || 'Standalone Entry',
-      imageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80',
-      observations: prompt("Enter Environmental Observations Field:") || 'N/A'
-    };
-    setSpeciesList([newEntry, ...speciesList]);
+  // Triggers the drawer for Species Mode
+  const handleOpenSpeciesForm = () => {
+    setFormConfig({
+      headline: 'SPECIES_RECORD',
+      schema: FORM_SCHEMAS.SPECIES,
+      type: 'SPECIES'
+    });
+    setIsFormOpen(true);
   };
 
-  const handleAddNewSample = () => {
-    const sampleId = prompt("Enter Sample Identification ID String:");
-    if (!sampleId) return;
-    const newEntry = {
-      id: Date.now(),
-      sampleId,
-      name: prompt("Enter Material Variant Type:") || 'Unspecified Core',
-      type: prompt("Enter Detailed Classification Type:") || 'Raw Compound',
-      date: new Date().toISOString().split('T')[0],
-      depth: prompt("Enter Extraction Depth:") || '0m',
-      missionName: prompt("Enter Core Mission Origin:") || 'Independent Extraction',
-      desc: prompt("Enter Composition Brief Details:") || 'No chemical assessment logged.',
-      imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80',
-      observations: prompt("Enter Laboratory Observations Summary:") || 'N/A'
-    };
-    setSamplesList([newEntry, ...samplesList]);
+  // Triggers the drawer for Sample Mode
+  const handleOpenSampleForm = () => {
+    setFormConfig({
+      headline: 'SAMPLE_RECORD',
+      schema: FORM_SCHEMAS.SAMPLE,
+      type: 'SAMPLE'
+    });
+    setIsFormOpen(true);
+  };
+
+  // Unified submit router
+  const handleRegistrySubmit = (formData) => {
+    if (formConfig.type === 'SPECIES') {
+      const newSpecies = {
+        id: Date.now(),
+        name: formData.commonName || 'Unspecified Common Name',
+        scientificName: formData.scientificName || 'Unknown sp.',
+        category: formData.category || 'Unclassified',
+        depth: formData.depth ? `${formData.depth}m` : '0m',
+        desc: formData.description || 'No baseline telemetry data registered.',
+        missionName: formData.missionName || 'Independent Entry',
+        imageUrl: formData.image ? URL.createObjectURL(formData.image) : 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80',
+        observations: formData.description || 'N/A'
+      };
+      setSpeciesList([newSpecies, ...speciesList]);
+    } else if (formConfig.type === 'SAMPLE') {
+      const newSample = {
+        id: Date.now(),
+        sampleId: formData.sampleId || `SMP-${Math.floor(Math.random() * 900) + 100}`,
+        name: formData.type || 'Unspecified Core',
+        type: formData.type || 'Raw Compound',
+        date: formData.collectionDate || new Date().toISOString().split('T')[0],
+        depth: formData.depth ? `${formData.depth}m` : '0m',
+        missionName: formData.missionName || 'Independent Extraction',
+        desc: formData.description || 'No chemical assessment logged.',
+        imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80',
+        observations: formData.description || 'N/A'
+      };
+      setSamplesList([newSample, ...samplesList]);
+    }
+    
+    setIsFormOpen(false);
   };
 
   return (
     <div className="missions-registry-viewport">
       
-      {/* Layer 1: species layer */}
+      {/* pecies layer */}
       <div className="glass-panel-card w-100 p-4 mb-5 position-relative">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <div className="panel-header-segment">
@@ -128,7 +152,7 @@ export default function ObservationPage() {
               <span className="text-success-glow-dot">✓</span> {speciesList.length} unique taxonomic profiles indexed this session
             </p>
           </div>
-          <button type="button" className="btn-add-action-node" onClick={handleAddNewSpecies}>
+          <button type="button" className="btn-add-action-node" onClick={handleOpenSpeciesForm}>
             Add New Species
           </button>
         </div>
@@ -163,7 +187,7 @@ export default function ObservationPage() {
         </div>
       </div>
 
-      {/* Layer 2: samples layer */}
+      {/* samples layer */}
       <div className="glass-panel-card w-100 p-4 position-relative">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <div className="panel-header-segment">
@@ -172,7 +196,7 @@ export default function ObservationPage() {
               <span className="text-success-glow-dot">✓</span> {samplesList.length} deep-sea isolates locked in secure containment vessels
             </p>
           </div>
-          <button type="button" className="btn-add-action-node" onClick={handleAddNewSample}>
+          <button type="button" className="btn-add-action-node" onClick={handleOpenSampleForm}>
             Add New Sample
           </button>
         </div>
@@ -209,11 +233,21 @@ export default function ObservationPage() {
         </div>
       </div>
 
+      {/* Detail overlay panel node */}
       <AssetDetailViewer 
         isOpen={isViewerOpen} 
         onClose={() => setIsViewerOpen(false)} 
         assetData={selectedAsset} 
       />
+
+      {isFormOpen && (
+        <UnifiedRegistryForm
+          headline={formConfig.headline}
+          schema={formConfig.schema}
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleRegistrySubmit}
+        />
+      )}
 
     </div>
   );
