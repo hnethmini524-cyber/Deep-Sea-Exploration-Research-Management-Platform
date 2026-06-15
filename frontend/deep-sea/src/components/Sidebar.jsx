@@ -16,7 +16,7 @@ const MENU_ITEMS = [
   { id: 'missions', label: 'Missions Search', icon: Compass, path: '/missions' },
   { id: 'researchers', label: 'Researchers', icon: Users, path: '/researchers' },
   { id: 'observations', label: 'Observations', icon: Waves, path: '/observations' },
-  { id: 'areas', label: 'Research Areas', icon: Map, path: '/research-areas' }, // Path match key
+  { id: 'areas', label: 'Research Areas', icon: Map, path: '/research-areas' },
   { id: 'about', label: 'System Info', icon: Info, path: '/about' },
 ];
 
