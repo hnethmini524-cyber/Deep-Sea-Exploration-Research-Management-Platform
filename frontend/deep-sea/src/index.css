@@ -11,6 +11,9 @@
 @import './styles/asset_detail_viewer.css';
 
 @import './styles/research_areas_page.css';
+@import './styles/profile_modal_popup.css';
+@import './styles/profile_page.css';
+@import './styles/sign_in_page.css';
 
 * {
   margin: 0;

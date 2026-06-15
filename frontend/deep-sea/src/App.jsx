@@ -9,6 +9,7 @@ import ResearchAreasPage from './pages/ResearchAreasPage';
 import MissionsPage from './pages/MissionsPage';
 import ResearcherPage from './pages/ResearcherPage';
 import ObservationPage from './pages/ObservationPage';
+import ProfilePage from './pages/ProfilePage';
 import './index.css';
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/researchers" element={<ResearcherPage />} />
             <Route path="/observations" element={<ObservationPage />} />
             <Route path="/research-areas" element={<ResearchAreasPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             
             {/* Authentication Routes */}
             <Route path="/signin" element={<SignInPage />} />
