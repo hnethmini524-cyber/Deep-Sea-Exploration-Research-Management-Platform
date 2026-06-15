@@ -10,6 +10,7 @@ import MissionsPage from './pages/MissionsPage';
 import ResearcherPage from './pages/ResearcherPage';
 import ObservationPage from './pages/ObservationPage';
 import ProfilePage from './pages/ProfilePage';
+import PasswordSetPage from './pages/PasswordSetPage';
 import './index.css';
 
 export default function App() {
@@ -26,8 +27,8 @@ export default function App() {
     setUser(null);
   };
 
-  // Check if the operator is currently interacting with an authentication terminal vector
-  const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
+  const fullScreenRoutes = ['/signin', '/signup', '/password'];
+  const isAuthPage = fullScreenRoutes.includes(location.pathname);
 
   return (
     <div className="app-layout-shell">
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/observations" element={<ObservationPage />} />
             <Route path="/research-areas" element={<ResearchAreasPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/password" element={<PasswordSetPage />} />
             
             {/* Authentication Routes */}
             <Route path="/signin" element={<SignInPage />} />
