@@ -39,17 +39,10 @@ export default function Navbar({ user, onSignOut }) {
             <div className="d-flex align-items-center gap-3">
               <button 
                 type="button" 
-                className="btn-nav-link monospace-text"
+                className="btn-nav-action-accent monospace-text"
                 onClick={() => navigate('/signin')}
               >
                 SIGN IN
-              </button>
-              <button 
-                type="button" 
-                className="btn-nav-action-accent monospace-text"
-                onClick={() => navigate('/signup')}
-              >
-                REGISTER
               </button>
             </div>
           ) : (
