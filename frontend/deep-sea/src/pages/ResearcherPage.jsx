@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, ChevronUp, Terminal } from 'lucide-react';
+import { ChevronDown, ChevronUp, Terminal, UserCheck, ShieldAlert } from 'lucide-react';
 import Pagination from '../components/Pagination';
 import UnifiedRegistryForm from '../components/UnifiedRegistryForm';
 import { FORM_SCHEMAS } from '../formSchemas';
 import '../styles/missions_page.css'; 
 
+// Mock data
 const EXTENDED_MOCK_MISSIONS = [
-  { id: 1, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-A1'},
-  { id: 2, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-B4'},
-  { id: 3, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'CORE-SYS'},
-  { id: 4, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'MOBILE-SST'},
-  { id: 5, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'SUBSYS-7'},
-  { id: 6, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2'},
-  { id: 7, name: 'John Watson', email: 'john@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2'},
-  { id: 8, name: 'John Watson', email: 'john@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-D1'},
-  { id: 9, name: 'Peter Johnson', email: 'peter@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2'},
-  { id: 10, name: 'Alan Watson', email: 'alan@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-D1'}
+  { id: 1, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-A1', enabled: true },
+  { id: 2, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-B4', enabled: true },
+  { id: 3, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'CORE-SYS', enabled: true },
+  { id: 4, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'MOBILE-SST', enabled: true },
+  { id: 5, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'SUBSYS-7', enabled: true },
+  { id: 6, name: 'John Doe', email: 'abd@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2', enabled: true },
+  { id: 7, name: 'John Watson', email: 'john@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2', enabled: false }, // PENDING
+  { id: 8, name: 'John Watson', email: 'john@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-D1', enabled: false },
+  { id: 9, name: 'Peter Johnson', email: 'peter@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-E2', enabled: true },
+  { id: 10, name: 'Alan Watson', email: 'alan@gmail.com', speacial: 'deep-sea', role: 'Main researcher', institution: 'UK Campus', assigns: 'ZONE-D1', enabled: false } // PENDING
 ];
 
 function MissionsDropdownCell({ missions }) {
@@ -55,7 +56,7 @@ function MissionsDropdownCell({ missions }) {
         <div className="cell-missions-floating-portal">
           <div className="portal-headline font-monospace">// ASSIGNED_TRACKS</div>
           <ul className="portal-items-list-pane">
-            {missions.map((mission, index) => (
+            {missions.map((mission, index) => ( 
               <li key={index} className="portal-mission-row font-monospace">
                 <Terminal size={12} className="text-info me-2 flex-shrink-0" />
                 <span className="text-truncate text-white">{mission}</span>
@@ -72,7 +73,6 @@ export default function ResearcherPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [researchersRawList, setResearchersRawList] = useState(EXTENDED_MOCK_MISSIONS);
-  
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const rowsPerPage = 5;
@@ -81,26 +81,22 @@ export default function ResearcherPage() {
     const commonBaseId = Date.now();
     const assignedMissionsArray = formData.assignedMissions || [];
     
-    // Create rows for each assigned track to match the reduction engine parsing
+    const basePayload = {
+      name: formData.researcherName || 'Anonymous Operator',
+      email: formData.email || 'unknown@domain.com',
+      speacial: formData.specialization || 'General Systems',
+      role: formData.role || 'Unassigned Field Asset',
+      institution: formData.institution || 'Independent Agent',
+      enabled: false // Production flow match status flag
+    };
+
     if (assignedMissionsArray.length === 0) {
-      const fallbackRow = {
-        id: commonBaseId,
-        name: formData.researcherName || 'Anonymous Operator',
-        email: formData.email || 'unknown@domain.com',
-        speacial: formData.specialization || 'General Systems',
-        role: formData.role || 'Unassigned Field Asset',
-        institution: formData.institution || 'Independent Agent',
-        assigns: 'CORE-SYS'
-      };
+      const fallbackRow = { ...basePayload, id: commonBaseId, assigns: 'CORE-SYS' };
       setResearchersRawList([fallbackRow, ...researchersRawList]);
     } else {
       const generatedRows = assignedMissionsArray.map((missionCode, index) => ({
+        ...basePayload,
         id: commonBaseId + index,
-        name: formData.researcherName || 'Anonymous Operator',
-        email: formData.email || 'unknown@domain.com',
-        speacial: formData.specialization || 'General Systems',
-        role: formData.role || 'Unassigned Field Asset',
-        institution: formData.institution || 'Independent Agent',
         assigns: missionCode
       }));
       setResearchersRawList([...generatedRows, ...researchersRawList]);
@@ -174,6 +170,7 @@ export default function ResearcherPage() {
                 <th className="table-head-cell">Specialization</th>
                 <th className="table-head-cell">Role</th>
                 <th className="table-head-cell">Institution</th>
+                <th className="table-head-cell text-center">Account Status</th> {/* Added Header Vector */}
                 <th className="table-head-cell">Assigned Missions</th>
               </tr>
             </thead>
@@ -187,6 +184,21 @@ export default function ResearcherPage() {
                     <td className="table-body-cell text-muted">{researcher.role}</td>
                     <td className="table-body-cell text-info fw-bold">{researcher.institution}</td>
                     
+                    {/* Status column */}
+                    <td className="table-body-cell text-center align-middle">
+                      {researcher.enabled ? (
+                        <div className="d-inline-flex align-items-center gap-1 px-2 py-1 rounded bg-success bg-opacity-10 border border-success border-opacity-20 text-success font-monospace small">
+                          <UserCheck size={12} />
+                          <span>ACTIVE</span>
+                        </div>
+                      ) : (
+                        <div className="d-inline-flex align-items-center gap-1 px-2 py-1 rounded bg-warning bg-opacity-10 border border-warning border-opacity-20 text-warning font-monospace small">
+                          <ShieldAlert size={12} />
+                          <span>PENDING</span>
+                        </div>
+                      )}
+                    </td>
+
                     <td className="table-body-cell visual-dropdown-overflow-cell">
                       <MissionsDropdownCell missions={researcher.missionsArray} />
                     </td>
@@ -194,7 +206,7 @@ export default function ResearcherPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center text-muted py-5">
+                  <td colSpan="7" className="text-center text-muted py-5">
                     No matching deployment parameters registered inside the active search matrix index.
                   </td>
                 </tr>
