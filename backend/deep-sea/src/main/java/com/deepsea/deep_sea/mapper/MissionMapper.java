@@ -2,10 +2,11 @@ package com.deepsea.deep_sea.mapper;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import com.deepsea.deep_sea.dto.MissionRequestDTO;
 import com.deepsea.deep_sea.dto.MissionResponseDTO;
+import com.deepsea.deep_sea.dto.SampleResponseDTO;
+import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.ResearchArea;
 import com.deepsea.deep_sea.model.User;
@@ -15,54 +16,61 @@ import org.springframework.stereotype.Component;
 @Component
 public class MissionMapper {
 
- public Mission toEntity(MissionRequestDTO dto, User leadResearcher, ResearchArea researchArea, MissionStatus status) {
-     if (dto == null) {
-         return null;
-     }
+    private final SampleMapper sampleMapper;
+    private final SpeciesMapper speciesMapper;
 
-     return Mission.builder()
-             .codeName(dto.getCodeName().trim())
-             .launchDate(dto.getLaunchDate())
-             .completionDate(dto.getCompletionDate())
-             .status(status)
-             .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
-             .leadResearcher(leadResearcher)
-             .researchArea(researchArea)
-             .build();
- }
+    public MissionMapper(SampleMapper sampleMapper, SpeciesMapper speciesMapper) {
+        this.sampleMapper = sampleMapper;
+        this.speciesMapper = speciesMapper;
+    }
 
- public MissionResponseDTO toResponseDTO(Mission mission) {
-     if (mission == null) {
-         return null;
-     }
+    public Mission toEntity(MissionRequestDTO dto, User leadResearcher, ResearchArea researchArea, MissionStatus status) {
+        if (dto == null) return null;
 
-     List<String> speciesObserved = Collections.emptyList();
-     if (mission.getObservations() != null) {
-         speciesObserved = mission.getObservations().stream()
-                 .filter(obs -> obs.getSpecies() != null)
-                 .map(obs -> obs.getSpecies().getCommonName())
-                 .distinct()
-                 .toList();
-     }
+        return Mission.builder()
+                .codeName(dto.getCodeName().trim())
+                .launchDate(dto.getLaunchDate())
+                .completionDate(dto.getCompletionDate())
+                .status(status)
+                .description(dto.getDescription() != null ? dto.getDescription().trim() : null)
+                .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
+                .leadResearcher(leadResearcher)
+                .researchArea(researchArea)
+                .build();
+    }
 
-     // Count parameters 
-     long totalSamplesCount = (mission.getSamples() != null) ? mission.getSamples().size() : 0;
-     long totalObservationsCount = (mission.getObservations() != null) ? mission.getObservations().size() : 0;
+    public MissionResponseDTO toResponseDTO(Mission mission, long totalSamplesCount) {
+        if (mission == null) return null;
 
-     return MissionResponseDTO.builder()
-             .id(mission.getId())
-             .codeName(mission.getCodeName())
-             .launchDate(mission.getLaunchDate())
-             .completionDate(mission.getCompletionDate())
-             .status(mission.getStatus())
-             .imageUrl(mission.getImageUrl())
-             .leadResearcherId(mission.getLeadResearcher().getId())
-             .leadResearcherName(mission.getLeadResearcher().getName())
-             .researchAreaId(mission.getResearchArea().getId())
-             .researchAreaName(mission.getResearchArea().getAreaName())
-             .speciesObserved(speciesObserved)
-             .totalSamplesLogged(totalSamplesCount)
-             .totalObservationsLogged(totalObservationsCount)
-             .build();
- }
-} 
+        // Gather basic string listing overview values
+        List<String> speciesNames = (mission.getSpecies() != null) 
+            ? mission.getSpecies().stream().map(s -> s.getCommonName()).toList()
+            : Collections.emptyList();
+
+        List<SampleResponseDTO> sampleDTOs = (mission.getSamples() != null)
+            ? mission.getSamples().stream().map(sampleMapper::toResponseDTO).toList()
+            : Collections.emptyList();
+
+        List<SpeciesResponseDTO> speciesDTOs = (mission.getSpecies() != null)
+            ? mission.getSpecies().stream().map(speciesMapper::toResponseDTO).toList()
+            : Collections.emptyList();
+
+        return MissionResponseDTO.builder()
+                .id(mission.getId())
+                .codeName(mission.getCodeName())
+                .launchDate(mission.getLaunchDate())
+                .completionDate(mission.getCompletionDate())
+                .status(mission.getStatus())
+                .description(mission.getDescription())
+                .imageUrl(mission.getImageUrl())
+                .leadResearcherId(mission.getLeadResearcher().getId())
+                .leadResearcherName(mission.getLeadResearcher().getName())
+                .researchAreaId(mission.getResearchArea().getId())
+                .researchAreaName(mission.getResearchArea().getAreaName())
+                .speciesObserved(speciesNames)
+                .totalSamplesLogged(totalSamplesCount)
+                .samples(sampleDTOs)      
+                .detailedSpecies(speciesDTOs) 
+                .build();
+    }
+}

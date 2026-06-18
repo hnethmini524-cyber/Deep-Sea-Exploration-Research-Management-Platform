@@ -6,8 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegistrationRequestDTO {
-
+public class ResearcherInviteDTO {
     @NotBlank
     @Size(min = 2, max = 100)
     private String name;
@@ -16,10 +15,6 @@ public class RegistrationRequestDTO {
     @Email
     @Size(max = 100)
     private String email;
-
-    @NotBlank
-    @Size(min = 8, max = 100)
-    private String password;
 
     @Size(max = 100)
     private String specialization;

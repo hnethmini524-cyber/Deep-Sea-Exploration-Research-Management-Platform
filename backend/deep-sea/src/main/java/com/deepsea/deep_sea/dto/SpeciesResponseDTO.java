@@ -14,5 +14,8 @@ public class SpeciesResponseDTO {
     private String category;
     private String description;
     private String imageUrl;
-
+    private double depth;
+    private String observations;
+    
+    private UUID missionId;
 }

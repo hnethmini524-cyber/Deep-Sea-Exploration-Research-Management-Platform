@@ -13,20 +13,9 @@ public class SampleResponseDTO {
     private UUID sampleId;
     private SampleType type;
     private LocalDateTime collectionDate;
-    private String notes;
+    private double depth;
+    private String description;
     private String imageUrl;
     
-    // Connected Mission Context
     private UUID missionId;
-    private String missionCodeName;
-    private String missionImageUrl;
-    
-    // Research Area Context 
-    private UUID researchAreaId;
-    private String researchAreaName;
-    private String geographicRegion;
-    
-    private UUID collectedById;
-    private String collectorName;
-
 }

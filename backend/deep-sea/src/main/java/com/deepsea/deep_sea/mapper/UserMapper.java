@@ -1,29 +1,31 @@
 package com.deepsea.deep_sea.mapper;
 
-import com.deepsea.deep_sea.dto.RegistrationRequestDTO;
+import com.deepsea.deep_sea.dto.ResearcherInviteDTO;
 import com.deepsea.deep_sea.dto.UserResponseDTO;
 import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.enums.UserRole;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserMapper {
 
-    public User toEntity(RegistrationRequestDTO dto, String passwordHash, UserRole assignedRole) {
+    public User toInviteEntity(ResearcherInviteDTO dto, String temporaryEncodedPassword) {
         if (dto == null) return null;
 
         return User.builder()
                 .name(dto.getName().trim())
                 .email(dto.getEmail().toLowerCase().trim())
-                .passwordHash(passwordHash)
-                .role(assignedRole)
-                .specialization(assignedRole == UserRole.RESEARCHER ? dto.getSpecialization() : null)
-                .institution(assignedRole == UserRole.RESEARCHER ? dto.getInstitution() : null)
+                .passwordHash(temporaryEncodedPassword)
+                .role(UserRole.RESEARCHER)
+                .specialization(dto.getSpecialization() != null ? dto.getSpecialization().trim() : null)
+                .institution(dto.getInstitution().trim())
                 .enabled(false)
                 .build();
     }
 
-    public UserResponseDTO toResponseDTO(User user) {
+    public UserResponseDTO toResponseDTO(User user, List<String> missionNames) {
         if (user == null) return null;
 
         return UserResponseDTO.builder()
@@ -34,6 +36,7 @@ public class UserMapper {
                 .specialization(user.getSpecialization())
                 .institution(user.getInstitution())
                 .enabled(user.isEnabled())
+                .assignedMissionNames(missionNames != null ? missionNames : List.of())
                 .build();
     }
 }

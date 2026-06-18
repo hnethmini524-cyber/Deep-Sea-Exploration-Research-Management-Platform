@@ -17,10 +17,11 @@ public class ResearchAreaMapper {
                 .latitude(dto.getLatitude())
                 .longitude(dto.getLongitude())
                 .description(dto.getDescription())
+                .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
                 .build();
     }
 
-    public ResearchAreaResponseDTO toResponseDTO(ResearchArea area) {
+    public ResearchAreaResponseDTO toResponseDTO(ResearchArea area, long missions, long species, long samples) {
         if (area == null) return null;
 
         return ResearchAreaResponseDTO.builder()
@@ -30,6 +31,10 @@ public class ResearchAreaMapper {
                 .latitude(area.getLatitude())
                 .longitude(area.getLongitude())
                 .description(area.getDescription())
+                .imageUrl(area.getImageUrl())
+                .totalMissionsLogged(missions)
+                .totalSpeciesIdentified(species)
+                .totalSamplesCollected(samples)
                 .build();
     }
 }

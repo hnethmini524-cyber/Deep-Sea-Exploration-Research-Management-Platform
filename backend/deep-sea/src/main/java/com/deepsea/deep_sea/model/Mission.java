@@ -29,6 +29,9 @@ public class Mission {
     @Column(name = "completion_date")
     private LocalDate completionDate;
     
+    @Column(length = 1000)
+    private String description;
+    
     @Column(name = "image_url", length = 512)
     private String imageUrl; 
 
@@ -37,7 +40,7 @@ public class Mission {
     private MissionStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lead_researcher_id", nullable = false)
+    @JoinColumn(name = "lead_researcher_id", nullable = true) 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User leadResearcher;
@@ -47,16 +50,16 @@ public class Mission {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private ResearchArea researchArea;
-    
-    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Builder.Default
-    private List<Observation> observations = new ArrayList<>();
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default
     private List<Sample> samples = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<Species> species = new ArrayList<>();
 }

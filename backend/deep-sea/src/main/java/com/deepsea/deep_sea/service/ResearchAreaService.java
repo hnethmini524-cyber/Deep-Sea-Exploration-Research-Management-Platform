@@ -8,8 +8,9 @@ import com.deepsea.deep_sea.mapper.ResearchAreaMapper;
 import com.deepsea.deep_sea.model.ResearchArea;
 import com.deepsea.deep_sea.repository.ResearchAreaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,23 +19,34 @@ public class ResearchAreaService {
     private final ResearchAreaRepository areaRepository;
     private final ResearchAreaMapper areaMapper;
 
-    public ResearchAreaService(ResearchAreaRepository areaRepository,ResearchAreaMapper areaMapper) {
+    public ResearchAreaService(ResearchAreaRepository areaRepository, ResearchAreaMapper areaMapper) {
         this.areaRepository = areaRepository;
         this.areaMapper = areaMapper;
     }
 
     @Transactional(readOnly = true)
-    public List<ResearchAreaResponseDTO> getAllAreas() {
-        return areaRepository.findAll().stream()
-                .map(areaMapper::toResponseDTO)
-                .toList();
+    public Page<ResearchAreaResponseDTO> getPaginatedAreas(Pageable pageable) {
+        Page<ResearchArea> areaPage = areaRepository.findAllPaginated(pageable);
+        
+        return areaPage.map(area -> {
+            long mCount = areaRepository.countMissionsByAreaId(area.getId());
+            long spCount = areaRepository.countSpeciesByAreaId(area.getId());
+            long smCount = areaRepository.countSamplesByAreaId(area.getId());
+            return areaMapper.toResponseDTO(area, mCount, spCount, smCount);
+        });
     }
 
     @Transactional(readOnly = true)
     public ResearchAreaResponseDTO getAreaById(UUID id) {
-        return areaRepository.findById(id)
-                .map(areaMapper::toResponseDTO)
+        ResearchArea area = areaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Research Area not found with ID: " + id));
+        
+        return areaMapper.toResponseDTO(
+            area,
+            areaRepository.countMissionsByAreaId(id),
+            areaRepository.countSpeciesByAreaId(id),
+            areaRepository.countSamplesByAreaId(id)
+        );
     }
 
     @Transactional
@@ -45,26 +57,9 @@ public class ResearchAreaService {
             throw new BadRequestException("A research area named '" + sanitizedName + "' already exists.");
         }
 
-        validateCoordinates(dto.getLatitude(), dto.getLongitude());
-
-        ResearchArea area = ResearchArea.builder()
-                .areaName(sanitizedName)
-                .region(dto.getRegion().trim())
-                .latitude(dto.getLatitude())
-                .longitude(dto.getLongitude())
-                .description(dto.getDescription())
-                .build();
-
-        ResearchArea savedArea = areaRepository.save(area);
-        return areaMapper.toResponseDTO(savedArea);
-    }
-
-    private void validateCoordinates(double latitude, double longitude) {
-        if (latitude < -90.0 || latitude > 90.0) {
-            throw new BadRequestException("Latitude must be between -90 and 90 degrees.");
-        }
-        if (longitude < -180.0 || longitude > 180.0) {
-            throw new BadRequestException("Longitude must be between -180 and 180 degrees.");
-        }
+        ResearchArea areaEntity = areaMapper.toEntity(dto);
+        ResearchArea savedArea = areaRepository.save(areaEntity);
+        
+        return areaMapper.toResponseDTO(savedArea, 0L, 0L, 0L);
     }
 }

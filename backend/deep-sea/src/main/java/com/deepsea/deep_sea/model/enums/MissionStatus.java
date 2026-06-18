@@ -4,5 +4,5 @@ public enum MissionStatus {
     PLANNING,
     ACTIVE,
     COMPLETED,
-    ABORTED
+    CANCELED
 }

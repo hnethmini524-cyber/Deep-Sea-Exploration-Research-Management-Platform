@@ -25,8 +25,11 @@ public class Sample {
     @Column(name = "collection_date", nullable = false)
     private LocalDateTime collectionDate;
 
+    @Column(nullable = false)
+    private double depth; 
+
     @Column(length = 1000)
-    private String notes;
+    private String description;
     
     @Column(name = "image_url", length = 512)
     private String imageUrl; 
@@ -36,10 +39,4 @@ public class Sample {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Mission mission;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collected_by_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private User collectedBy;
 }

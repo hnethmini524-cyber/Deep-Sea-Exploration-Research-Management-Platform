@@ -7,71 +7,34 @@ import com.deepsea.deep_sea.model.enums.SampleType;
 
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Component
 public class SampleMapper {
 
-    public Sample toEntity(SampleRequestDTO dto, Mission mission, User collector) {
+    public Sample toEntity(SampleRequestDTO dto, Mission mission, SampleType type) {
         if (dto == null) return null;
 
-        SampleType parsedType = null;
-        if (dto.getType() != null) {
-            parsedType = SampleType.valueOf(dto.getType().toUpperCase().trim());
-        }
-
         return Sample.builder()
-                .type(parsedType)
+                .type(type)
                 .collectionDate(dto.getCollectionDate() != null ? dto.getCollectionDate() : LocalDateTime.now())
-                .notes(dto.getNotes() != null ? dto.getNotes().trim() : null)
+                .depth(dto.getDepth())
+                .description(dto.getDescription() != null ? dto.getDescription().trim() : null)
                 .mission(mission)
                 .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
-                .collectedBy(collector)
                 .build();
     }
 
     public SampleResponseDTO toResponseDTO(Sample sample) {
         if (sample == null) return null;
 
-        // Context Null-Safeguards
-        UUID missionId = null;
-        String missionCodeName = null;
-        String missionImageUrl = null;
-        UUID researchAreaId = null;
-        String researchAreaName = null;
-        String geographicRegion = null;
-
-        if (sample.getMission() != null) {
-            Mission mission = sample.getMission();
-            missionId = mission.getId();
-            missionCodeName = mission.getCodeName();
-            missionImageUrl = mission.getImageUrl();
-
-            if (mission.getResearchArea() != null) {
-                ResearchArea area = mission.getResearchArea();
-                researchAreaId = area.getId();
-                researchAreaName = area.getAreaName();
-                geographicRegion = area.getRegion();
-            }
-        }
-
-        UUID collectedById = (sample.getCollectedBy() != null) ? sample.getCollectedBy().getId() : null;
-        String collectorName = (sample.getCollectedBy() != null) ? sample.getCollectedBy().getName() : null;
-
         return SampleResponseDTO.builder()
                 .sampleId(sample.getId())
                 .type(sample.getType())
                 .collectionDate(sample.getCollectionDate())
-                .notes(sample.getNotes())
-                .missionId(missionId)
-                .missionCodeName(missionCodeName)
+                .depth(sample.getDepth())
+                .description(sample.getDescription())
                 .imageUrl(sample.getImageUrl())
-                .researchAreaId(researchAreaId)
-                .missionImageUrl(missionImageUrl)
-                .researchAreaName(researchAreaName)
-                .geographicRegion(geographicRegion)
-                .collectedById(collectedById)
-                .collectorName(collectorName)
+                .missionId(sample.getMission() != null ? sample.getMission().getId() : null)
                 .build();
     }
 }

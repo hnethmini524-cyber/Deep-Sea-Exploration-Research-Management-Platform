@@ -4,30 +4,33 @@ import com.deepsea.deep_sea.dto.SpeciesRequestDTO;
 import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
 import com.deepsea.deep_sea.exception.BadRequestException;
 import com.deepsea.deep_sea.exception.ResourceNotFoundException;
+import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.Species;
+import com.deepsea.deep_sea.repository.MissionRepository;
 import com.deepsea.deep_sea.repository.SpeciesRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.deepsea.deep_sea.mapper.SpeciesMapper;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class SpeciesService {
 
     private final SpeciesRepository speciesRepository;
+    private final MissionRepository missionRepository;
     private final SpeciesMapper speciesMapper;
 
-    public SpeciesService(SpeciesRepository speciesRepository,SpeciesMapper speciesMapper) {
+    public SpeciesService(SpeciesRepository speciesRepository, MissionRepository missionRepository, SpeciesMapper speciesMapper) {
         this.speciesRepository = speciesRepository;
+        this.missionRepository = missionRepository;
         this.speciesMapper = speciesMapper;
     }
 
     @Transactional(readOnly = true)
-    public List<SpeciesResponseDTO> getAllSpecies() {
-        return speciesRepository.findAll().stream()
-                .map(speciesMapper::toResponseDTO)
-                .toList();
+    public Page<SpeciesResponseDTO> getPaginatedSpecies(Pageable pageable) {
+        return speciesRepository.findAll(pageable).map(speciesMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
@@ -45,14 +48,12 @@ public class SpeciesService {
             throw new BadRequestException("Species classification '" + stylizedScientificName + "' is already registered.");
         }
 
-        Species species = Species.builder()
-                .scientificName(stylizedScientificName)
-                .commonName(dto.getCommonName().trim())
-                .category(dto.getCategory().trim())
-                .description(dto.getDescription())
-                .build();
+        Mission mission = missionRepository.findById(dto.getMissionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Assigned mission ecosystem catalog framework does not exist."));
 
-        Species savedSpecies = speciesRepository.save(species);
+        Species speciesEntity = speciesMapper.toEntity(dto, mission);
+        Species savedSpecies = speciesRepository.save(speciesEntity);
+        
         return speciesMapper.toResponseDTO(savedSpecies);
     }
 }

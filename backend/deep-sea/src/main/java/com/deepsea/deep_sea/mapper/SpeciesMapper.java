@@ -2,13 +2,14 @@ package com.deepsea.deep_sea.mapper;
 
 import com.deepsea.deep_sea.dto.SpeciesRequestDTO;
 import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
+import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.Species;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SpeciesMapper {
 
-    public Species toEntity(SpeciesRequestDTO dto) {
+    public Species toEntity(SpeciesRequestDTO dto, Mission mission) {
         if (dto == null) return null;
 
         return Species.builder()
@@ -17,6 +18,9 @@ public class SpeciesMapper {
                 .category(dto.getCategory().trim())
                 .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
                 .description(dto.getDescription())
+                .depth(dto.getDepth())
+                .observations(dto.getObservations().trim())
+                .mission(mission)
                 .build();
     }
 
@@ -30,6 +34,9 @@ public class SpeciesMapper {
                 .category(species.getCategory())
                 .imageUrl(species.getImageUrl())
                 .description(species.getDescription())
+                .depth(species.getDepth())
+                .observations(species.getObservations())
+                .missionId(species.getMission() != null ? species.getMission().getId() : null)
                 .build();
     }
 }

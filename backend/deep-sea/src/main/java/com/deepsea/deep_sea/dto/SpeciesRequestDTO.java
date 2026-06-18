@@ -1,6 +1,9 @@
 package com.deepsea.deep_sea.dto;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,5 +25,13 @@ public class SpeciesRequestDTO {
     @Size(max = 1000)
     private String description;
     
+    @NotNull(message = "Depth parameter is required")
+    private Double depth;
+
+    @NotBlank(message = "Observation narrative notes are required")
+    private String observations;
+    
     private String imageUrl;
+    
+    private UUID missionId;
 }

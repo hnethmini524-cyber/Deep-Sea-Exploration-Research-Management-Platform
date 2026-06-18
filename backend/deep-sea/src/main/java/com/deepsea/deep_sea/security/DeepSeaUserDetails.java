@@ -20,6 +20,7 @@ public class DeepSeaUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // System only contains ADMIN and RESEARCHER roles
         return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
@@ -44,7 +45,7 @@ public class DeepSeaUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled(); // Utilizes your database verification check state!
+        return user.isEnabled(); // Links account access states back to token verification checks
     }
 
     public UUID getId() {

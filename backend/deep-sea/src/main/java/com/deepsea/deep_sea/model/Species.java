@@ -3,7 +3,9 @@ package com.deepsea.deep_sea.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
@@ -35,7 +37,19 @@ public class Species {
     
     @Column(name = "image_url", length = 512)
     private String imageUrl; 
+    
+    @Column(nullable = false)
+    private double depth;
+
+    @Column(columnDefinition = "TEXT") 
+    private String observations;
 
     @Column(length = 1000)
     private String description;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mission_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Mission mission;
 }

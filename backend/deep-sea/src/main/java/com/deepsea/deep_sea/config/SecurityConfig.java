@@ -24,7 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableMethodSecurity // Activates fine-grained role authorization like @PreAuthorize("hasRole('ADMIN')")
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -43,15 +43,26 @@ public class SecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Public authentication paths
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                		// Authentication endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/confirm").permitAll()
                         
+                        // Public details views (read-only)
                         .requestMatchers(HttpMethod.GET, "/api/v1/missions/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/areas/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/species/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/observations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/samples/**").permitAll()
                         
-                        // Strict fallback catch-all
+                        // Strict Admin boundaries
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/invite").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+                        
+                        // Secure shared application 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/researchers").hasAnyAuthority("ROLE_ADMIN", "ROLE_RESEARCHER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_RESEARCHER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_RESEARCHER")
+                        
+                        // Fallback lock
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

@@ -14,5 +14,10 @@ public class ResearchAreaResponseDTO {
     private double latitude;
     private double longitude;
     private String description;
+    private String imageUrl; 
 
+    // System requirements metrics 
+    private long totalMissionsLogged;
+    private long totalSpeciesIdentified;
+    private long totalSamplesCollected;
 }

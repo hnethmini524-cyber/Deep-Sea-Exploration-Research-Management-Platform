@@ -9,7 +9,6 @@ import lombok.Data;
 
 @Data
 public class ResearchAreaRequestDTO {
-
     @NotBlank(message = "Area name is required")
     @Size(max = 100)
     private String areaName;
@@ -19,15 +18,15 @@ public class ResearchAreaRequestDTO {
     private String region;
 
     @NotNull(message = "Latitude is required")
-    @Min(value = -90, message = "Latitude must be at least -90 degrees")
-    @Max(value = 90, message = "Latitude cannot exceed 90 degrees")
+    @Min(-90) @Max(90)
     private Double latitude;
 
     @NotNull(message = "Longitude is required")
-    @Min(value = -180, message = "Longitude must be at least -180 degrees")
-    @Max(value = 180, message = "Longitude cannot exceed 180 degrees")
+    @Min(-180) @Max(180)
     private Double longitude;
 
     @Size(max = 1000)
     private String description;
+
+    private String imageUrl; 
 }

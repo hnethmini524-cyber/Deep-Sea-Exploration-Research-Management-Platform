@@ -15,15 +15,18 @@ public class MissionResponseDTO {
     private LocalDate launchDate;
     private LocalDate completionDate;
     private MissionStatus status;
+    private String description;
     private UUID leadResearcherId;
     private String leadResearcherName;
     private UUID researchAreaId;
     private String researchAreaName;
     private String imageUrl;
+    
+    // Summary data for tables and overview displays
     private List<String> speciesObserved;
-
     private long totalSamplesLogged;
 
-    private long totalObservationsLogged;
-
+    // Added detailed collections
+    private List<SampleResponseDTO> samples;
+    private List<SpeciesResponseDTO> detailedSpecies; 
 }

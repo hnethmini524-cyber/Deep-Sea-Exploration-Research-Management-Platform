@@ -8,11 +8,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class MissionRequestDTO {
-
-    @NotBlank(message = "Mission code name is required")
-    @Size(max = 100)
-    private String codeName;
+public class MissionUpdateDTO {
 
     @NotNull(message = "Launch date is required")
     private LocalDate launchDate;
@@ -22,7 +18,6 @@ public class MissionRequestDTO {
     @NotBlank(message = "Status condition is required")
     @Size(max = 20)
     private String status; 
-    private String description;
 
     @NotNull(message = "A lead researcher ID must be assigned")
     private UUID leadResearcherId;
@@ -32,4 +27,6 @@ public class MissionRequestDTO {
     
     private String imageUrl;
     
+    @Size(max = 1000, message = "Description cannot exceed 1000 characters")
+    private String description;
 }
