@@ -4,7 +4,6 @@ import com.deepsea.deep_sea.dto.SpeciesRequestDTO;
 import com.deepsea.deep_sea.dto.SpeciesResponseDTO;
 import com.deepsea.deep_sea.exception.BadRequestException;
 import com.deepsea.deep_sea.exception.ResourceNotFoundException;
-import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.repository.MissionRepository;
 import com.deepsea.deep_sea.repository.SpeciesRepository;
@@ -43,17 +42,14 @@ public class SpeciesService {
     @Transactional
     public SpeciesResponseDTO addSpecies(SpeciesRequestDTO dto) {
         String stylizedScientificName = dto.getScientificName().trim();
-        
+
         if (speciesRepository.findByScientificNameIgnoreCase(stylizedScientificName).isPresent()) {
             throw new BadRequestException("Species classification '" + stylizedScientificName + "' is already registered.");
         }
 
-        Mission mission = missionRepository.findById(dto.getMissionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Assigned mission ecosystem catalog framework does not exist."));
-
-        Species speciesEntity = speciesMapper.toEntity(dto, mission);
+        Species speciesEntity = speciesMapper.toEntity(dto);
         Species savedSpecies = speciesRepository.save(speciesEntity);
-        
+
         return speciesMapper.toResponseDTO(savedSpecies);
     }
 }

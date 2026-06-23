@@ -11,11 +11,11 @@ import java.util.UUID;
 @Builder
 public class SampleResponseDTO {
     private UUID sampleId;
+    private String sampleCode;
     private SampleType type;
     private LocalDateTime collectionDate;
     private double depth;
     private String description;
     private String imageUrl;
     
-    private UUID missionId;
 }

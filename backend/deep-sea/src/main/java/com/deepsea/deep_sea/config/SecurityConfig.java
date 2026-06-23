@@ -6,6 +6,7 @@ import com.deepsea.deep_sea.security.JwtAuthenticationFilter;
 import com.deepsea.deep_sea.service.AuthenticationService;
 
 import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

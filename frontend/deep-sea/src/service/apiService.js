@@ -32,9 +32,14 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
+        if (
+          error.response?.status === 401 ||
+          error.response?.status === 403
+        ) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+
+          window.location.href = "/signin";
         }
         return Promise.reject(this.#handleError(error));
       }
@@ -77,8 +82,24 @@ class ApiService {
     return response.data;
   }
 
-  async fetchResearchers(page = 0, size = 10) {
-    const response = await this.api.get('/users', { params: { page, size } });
+  async fetchResearchers(page = 0, size = 6) {
+    // Aligned with UserController mapping path: /api/v1/users/researchers
+    const response = await this.api.get('/users/researchers', { params: { page, size } });
+    return response.data;
+  }
+
+  async fetchUserProfile(id) {
+    const response = await this.api.get(`/users/${id}`);
+    return response.data;
+  }
+
+  async updateUserProfile(id, updateDto) {
+    const response = await this.api.put(`/users/${id}`, updateDto);
+    return response.data;
+  }
+
+  async deleteUser(id) {
+    const response = await this.api.delete(`/users/${id}`);
     return response.data;
   }
 
@@ -95,7 +116,8 @@ class ApiService {
   }
 
   async searchMissions(query, page = 0, size = 10) {
-    const response = await this.api.get('/missions/search', { params: { query, page, size } });
+    // Standardizes query parsing fallback matching MissionController schema bindings
+    const response = await this.api.get('/missions', { params: { search: query, page, size } });
     return response.data;
   }
 
@@ -116,13 +138,8 @@ class ApiService {
 
   // Samples endpoints
 
-  async getSamples(page = 0, size = 10) {
+  async getSamples(page = 0, size = 15) {
     const response = await this.api.get('/samples', { params: { page, size } });
-    return response.data;
-  }
-
-  async getSamplesByMission(missionId, page = 0, size = 10) {
-    const response = await this.api.get(`/samples/mission/${missionId}`, { params: { page, size } });
     return response.data;
   }
 
@@ -131,42 +148,49 @@ class ApiService {
     return response.data;
   }
 
-  async getSamples(id) {
+  async getSampleById(id) {
     const response = await this.api.get(`/samples/${id}`);
     return response.data;
   }
 
-  // species endpoints
+  // Species endpoints
 
-  async getAllSpecies(page = 0, size = 10) {
+  async getSpecies(page = 0, size = 10) {
     const response = await this.api.get('/species', { params: { page, size } });
     return response.data;
   }
 
-  async registerSpecies(species) {
+  async createSpecies(species) {
     const response = await this.api.post('/species', species);
     return response.data;
   }
 
-  async getSpecies(id) {
+  async getSpeciesById(id) {
     const response = await this.api.get(`/species/${id}`);
     return response.data;
   }
 
   // Research area endpoints
 
-  async getAllAreas(page = 0, size = 6) {
-    const response = await this.api.get('/areas', {params: {page, size}});
+  async getResearchAreas(page = 0, size = 12, query = '') {
+    const response = await this.api.get(`/areas`, {
+      params: { page, size, search: query }
+    });
+    return response.data; 
+  }
+
+  async createResearchArea(newPayload) {
+    const response = await this.api.post(`/areas`, newPayload);
     return response.data;
   }
 
-  async createArea(areas) {
-    const response = await this.api.post('/areas', areas);
+  async getResearchAreaById(id) {
+    const response = await this.api.get(`/areas/${id}`);
     return response.data;
   }
 
-  async getAreas(id) {
-    const response = await this.get(`/areas/${id}`);
+  async getResearchAreasList() {
+    const response = await this.api.get('/areas'); 
     return response.data;
   }
 
@@ -181,6 +205,7 @@ class ApiService {
         "Content-Type": "multipart/form-data",
       }
     });
+    // Returns string payload (URL) context derived directly from backend controller layer
     return response.data; 
   }
 }

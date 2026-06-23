@@ -35,19 +35,14 @@ public class UserService {
     public Page<UserResponseDTO> findPaginatedResearchers(Pageable pageable) {
         // Fetches a subset page chunk of researchers matching filters
         Page<User> researcherPage = userRepository.findAllByRole(UserRole.RESEARCHER, pageable);
-        
-        return researcherPage.map(user -> {
-            List<String> missions = userRepository.findAssignedMissionNamesByUserId(user.getId());
-            return userMapper.toResponseDTO(user, missions);
-        });
+        return researcherPage.map(userMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
     public UserResponseDTO findUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Personnel account profile not found."));
-        List<String> missions = userRepository.findAssignedMissionNamesByUserId(id);
-        return userMapper.toResponseDTO(user, missions);
+        return userMapper.toResponseDTO(user);
     }
 
     // Edit profile parameters restricted ONLY to email and institution 
@@ -59,15 +54,14 @@ public class UserService {
         String targetEmail = dto.getEmail().trim().toLowerCase();
         
         if (!user.getEmail().equals(targetEmail) && userRepository.findByEmail(targetEmail).isPresent()) {
-            throw new BadRequestException("Modification Aborted: Email variant tracking destination conflict.");
+            throw new BadRequestException("Modification Canceled: Email variant tracking destination conflict.");
         }
 
         user.setEmail(targetEmail);
         user.setInstitution(dto.getInstitution().trim());
 
         User updatedUser = userRepository.save(user);
-        List<String> missions = userRepository.findAssignedMissionNamesByUserId(id);
-        return userMapper.toResponseDTO(updatedUser, missions);
+        return userMapper.toResponseDTO(updatedUser);
     }
 
     // Clear reference pointer links to protect historical mission logging logs

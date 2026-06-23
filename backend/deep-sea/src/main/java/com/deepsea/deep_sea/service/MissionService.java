@@ -8,16 +8,23 @@ import com.deepsea.deep_sea.exception.ResourceNotFoundException;
 import com.deepsea.deep_sea.mapper.MissionMapper;
 import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.ResearchArea;
+import com.deepsea.deep_sea.model.Sample;
+import com.deepsea.deep_sea.model.Species;
 import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.enums.MissionStatus;
 import com.deepsea.deep_sea.repository.MissionRepository;
 import com.deepsea.deep_sea.repository.ResearchAreaRepository;
+import com.deepsea.deep_sea.repository.SampleRepository;
+import com.deepsea.deep_sea.repository.SpeciesRepository;
 import com.deepsea.deep_sea.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,12 +34,23 @@ public class MissionService {
     private final MissionMapper missionMapper;
     private final ResearchAreaRepository areaRepository;
     private final UserRepository userRepository;
+    private final SpeciesRepository speciesRepository;
+    private final SampleRepository sampleRepository;
 
-    public MissionService(MissionRepository missionRepository, MissionMapper missionMapper,ResearchAreaRepository areaRepository,UserRepository userRepository) {
+    public MissionService(
+            MissionRepository missionRepository,
+            MissionMapper missionMapper,
+            ResearchAreaRepository areaRepository,
+            UserRepository userRepository,
+            SpeciesRepository speciesRepository,
+            SampleRepository sampleRepository) {
+
         this.missionRepository = missionRepository;
         this.missionMapper = missionMapper;
-        this.areaRepository= areaRepository;
-        this.userRepository= userRepository;
+        this.areaRepository = areaRepository;
+        this.userRepository = userRepository;
+        this.speciesRepository = speciesRepository;
+        this.sampleRepository = sampleRepository;
     }
     
     @Transactional
@@ -57,6 +75,19 @@ public class MissionService {
 
         Mission missionEntity = missionMapper.toEntity(dto, leader, area, parsedStatus);
         
+        List<Species> species =
+                dto.getSpeciesIds() != null
+                        ? speciesRepository.findAllById(dto.getSpeciesIds())
+                        : Collections.emptyList();
+
+        List<Sample> samples =
+                dto.getSampleIds() != null
+                        ? sampleRepository.findAllById(dto.getSampleIds())
+                        : Collections.emptyList();
+
+        missionEntity.setSpecies(species);
+        missionEntity.setSamples(samples);
+        
         Mission savedMission = missionRepository.save(missionEntity);
         return missionMapper.toResponseDTO(savedMission, 0L); 
     }
@@ -77,16 +108,11 @@ public class MissionService {
     
     @Transactional(readOnly = true)
     public MissionResponseDTO getMissionById(UUID id) {
-    	
-        Mission mission = missionRepository.findByIdWithAssociations(id)
+        // Fix: Use findDetailedMission to properly fetch your eager collections 
+        Mission mission = missionRepository.findDetailedMission(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Mission workspace not found with ID: " + id));
         
-        missionRepository.findByIdWithSpecies(id);
-        missionRepository.findByIdWithSamples(id);
-        
-        // Pre-compute aggregate total metrics
         long samplesCount = missionRepository.countSamplesByMissionId(id);
-        
         return missionMapper.toResponseDTO(mission, samplesCount);
     }
     
@@ -118,6 +144,18 @@ public class MissionService {
         mission.setStatus(parsedStatus);
         mission.setLeadResearcher(leader);
         mission.setResearchArea(area);
+        List<Species> species =
+                dto.getSpeciesIds() != null
+                        ? speciesRepository.findAllById(dto.getSpeciesIds())
+                        : Collections.emptyList();
+
+        List<Sample> samples =
+                dto.getSampleIds() != null
+                        ? sampleRepository.findAllById(dto.getSampleIds())
+                        : Collections.emptyList();
+
+        mission.setSpecies(species);
+        mission.setSamples(samples);
         mission.setDescription(dto.getDescription() != null ? dto.getDescription().trim() : null);
         if (dto.getImageUrl() != null) {
             mission.setImageUrl(dto.getImageUrl().trim());

@@ -2,7 +2,8 @@ package com.deepsea.deep_sea.service;
 
 import com.deepsea.deep_sea.dto.SampleRequestDTO;
 import com.deepsea.deep_sea.dto.SampleResponseDTO;
-import com.deepsea.deep_sea.model.*;
+import com.deepsea.deep_sea.model.Sample;
+import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.enums.MissionStatus;
 import com.deepsea.deep_sea.model.enums.SampleType;
 import com.deepsea.deep_sea.exception.BadRequestException;
@@ -21,15 +22,10 @@ import java.util.UUID;
 public class SampleService {
 
     private final SampleRepository sampleRepository;
-    private final MissionRepository missionRepository;
-    private final UserRepository userRepository;
     private final SampleMapper sampleMapper;
 
-    public SampleService(SampleRepository sampleRepository, MissionRepository missionRepository, 
-                         UserRepository userRepository, SampleMapper sampleMapper) {
+    public SampleService(SampleRepository sampleRepository, SampleMapper sampleMapper) {
         this.sampleRepository = sampleRepository;
-        this.missionRepository = missionRepository;
-        this.userRepository = userRepository;
         this.sampleMapper = sampleMapper;
     }
 
@@ -47,13 +43,7 @@ public class SampleService {
 
     @Transactional
     public SampleResponseDTO createSample(SampleRequestDTO dto) {
-        Mission mission = missionRepository.findById(dto.getMissionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Assigned mission execution scope does not exist."));
-
-        if (MissionStatus.ACTIVE != mission.getStatus()) {
-            throw new BadRequestException("Process Aborted: Cannot log samples for an inactive mission profile.");
-        }
-
+        // Parse out sample type enum parameter safely
         SampleType parsedType;
         try {
             parsedType = SampleType.valueOf(dto.getType().toUpperCase().trim());
@@ -61,7 +51,9 @@ public class SampleService {
             throw new BadRequestException("Unsupported taxonomic physical sample type: " + dto.getType());
         }
 
-        Sample sampleEntity = sampleMapper.toEntity(dto, mission, parsedType);
+        // Map directly into a standalone entity without lookups or relation handling
+        Sample sampleEntity = sampleMapper.toEntity(dto, parsedType);
+        
         Sample savedSample = sampleRepository.save(sampleEntity);
         
         return sampleMapper.toResponseDTO(savedSample);

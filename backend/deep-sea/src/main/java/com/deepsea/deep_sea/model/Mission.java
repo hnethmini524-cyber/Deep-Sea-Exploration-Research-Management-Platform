@@ -51,15 +51,21 @@ public class Mission {
     @EqualsAndHashCode.Exclude
     private ResearchArea researchArea;
 
-    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "mission_samples",
+        joinColumns = @JoinColumn(name = "mission_id"),
+        inverseJoinColumns = @JoinColumn(name = "sample_id")
+    )
     @Builder.Default
     private List<Sample> samples = new ArrayList<>();
     
-    @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToMany
+    @JoinTable(
+        name = "mission_species",
+        joinColumns = @JoinColumn(name = "mission_id"),
+        inverseJoinColumns = @JoinColumn(name = "species_id")
+    )
     @Builder.Default
     private List<Species> species = new ArrayList<>();
 }

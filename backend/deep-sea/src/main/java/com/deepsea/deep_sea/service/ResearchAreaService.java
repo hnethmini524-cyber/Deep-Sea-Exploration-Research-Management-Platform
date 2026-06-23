@@ -26,14 +26,10 @@ public class ResearchAreaService {
 
     @Transactional(readOnly = true)
     public Page<ResearchAreaResponseDTO> getPaginatedAreas(Pageable pageable) {
-        Page<ResearchArea> areaPage = areaRepository.findAllPaginated(pageable);
         
-        return areaPage.map(area -> {
-            long mCount = areaRepository.countMissionsByAreaId(area.getId());
-            long spCount = areaRepository.countSpeciesByAreaId(area.getId());
-            long smCount = areaRepository.countSamplesByAreaId(area.getId());
-            return areaMapper.toResponseDTO(area, mCount, spCount, smCount);
-        });
+        return areaRepository
+                .findAllPaginated(pageable)
+                .map(areaMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
@@ -41,12 +37,7 @@ public class ResearchAreaService {
         ResearchArea area = areaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Research Area not found with ID: " + id));
         
-        return areaMapper.toResponseDTO(
-            area,
-            areaRepository.countMissionsByAreaId(id),
-            areaRepository.countSpeciesByAreaId(id),
-            areaRepository.countSamplesByAreaId(id)
-        );
+        return areaMapper.toResponseDTO(area);
     }
 
     @Transactional
@@ -60,6 +51,6 @@ public class ResearchAreaService {
         ResearchArea areaEntity = areaMapper.toEntity(dto);
         ResearchArea savedArea = areaRepository.save(areaEntity);
         
-        return areaMapper.toResponseDTO(savedArea, 0L, 0L, 0L);
+        return areaMapper.toResponseDTO(savedArea);
     }
 }

@@ -1,14 +1,36 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { apiService } from '../service/ApiService'; 
 
 export default function SignUpPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignInSubmit = (e) => {
+  const handleSignUpSubmit = async (e) => {
     e.preventDefault();
-    console.log("Authenticating operator parameters:", { name, email, password });
+    try {
+      setIsLoading(true);
+      setError('');
+      setSuccessMsg('');
+      
+      const payload = { name, email, password };
+      await apiService.register(payload);
+      
+      setSuccessMsg('Registration parameters deployed successfully! Routing to checkpoint...');
+      
+      setTimeout(() => {
+        navigate('/signin');
+      }, 1500);
+    } catch (err) {
+      setError(err?.message || "Registration vector rejected by remote database matrix.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,16 +55,29 @@ export default function SignUpPage() {
               <p className="form-subtitle-caption">Enter your details to sign up</p>
             </div>
 
-            <form onSubmit={handleSignInSubmit} className="interactive-auth-form">
+            {error && (
+              <div className="alert alert-danger font-monospace text-center py-2 small bg-danger bg-opacity-10 border border-danger border-opacity-20 text-danger rounded mb-3">
+                !! REGISTER_FAILURE: {error} !!
+              </div>
+            )}
+
+            {successMsg && (
+              <div className="alert alert-success font-monospace text-center py-2 small bg-success bg-opacity-10 border border-success border-opacity-20 text-success rounded mb-3">
+                &gt;&gt; {successMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSignUpSubmit} className="interactive-auth-form">
 
               <div className="auth-input-group">
                 <label className="auth-input-label">User Name</label>
                 <input 
-                  type="name" 
+                  type="text" 
                   className="auth-terminal-field"
                   placeholder="Your name here"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading || successMsg}
                   required
                 />
               </div>
@@ -55,6 +90,7 @@ export default function SignUpPage() {
                   placeholder="Your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading || successMsg}
                   required
                 />
               </div>
@@ -67,12 +103,17 @@ export default function SignUpPage() {
                   placeholder="Your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading || successMsg}
                   required
                 />
               </div>
 
-              <button type="submit" className="btn-auth-deploy-action">
-                SIGN UP
+              <button 
+                type="submit" 
+                className="btn-auth-deploy-action"
+                disabled={isLoading || successMsg}
+              >
+                {isLoading ? 'DEPLOYING RECREATION RECORD...' : 'SIGN UP'}
               </button>
 
             </form>

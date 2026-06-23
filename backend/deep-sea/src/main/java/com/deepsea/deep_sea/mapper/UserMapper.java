@@ -6,7 +6,6 @@ import com.deepsea.deep_sea.model.User;
 import com.deepsea.deep_sea.model.enums.UserRole;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Component
 public class UserMapper {
@@ -25,7 +24,7 @@ public class UserMapper {
                 .build();
     }
 
-    public UserResponseDTO toResponseDTO(User user, List<String> missionNames) {
+    public UserResponseDTO toResponseDTO(User user) {
         if (user == null) return null;
 
         return UserResponseDTO.builder()
@@ -36,7 +35,6 @@ public class UserMapper {
                 .specialization(user.getSpecialization())
                 .institution(user.getInstitution())
                 .enabled(user.isEnabled())
-                .assignedMissionNames(missionNames != null ? missionNames : List.of())
                 .build();
     }
 }

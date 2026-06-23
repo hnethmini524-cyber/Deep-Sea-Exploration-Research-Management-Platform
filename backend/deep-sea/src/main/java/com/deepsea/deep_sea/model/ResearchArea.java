@@ -3,10 +3,14 @@ package com.deepsea.deep_sea.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Entity
@@ -40,4 +44,5 @@ public class ResearchArea {
 
     @Column(length = 1000)
     private String description;
+    
 }

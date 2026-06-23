@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { NavLink, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate, NavLink } from 'react-router-dom';
+import { apiService } from '../service/ApiService'; 
 
 export default function PasswordSetPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const inviteToken = searchParams.get('token');
   const userEmail = searchParams.get('email') || 'your registered email';
 
-  const handlePasswordSetupSubmit = (e) => {
+  const handlePasswordSetupSubmit = async (e) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -18,11 +21,28 @@ export default function PasswordSetPage() {
       return;
     }
     
-    setErrorMsg('');
-    console.log("Transmitting secure credential initialization:", { 
-      token: inviteToken, 
-      password: password 
-    });
+    if (!inviteToken) {
+      setErrorMsg("!! ERROR: Operational security token is missing !!");
+      return;
+    }
+
+    try {
+      setErrorMsg('');
+      setIsSubmitting(true);
+
+      // Matches backend structure: token payload initialization mapping
+      await apiService.confirmPassword({
+        token: inviteToken,
+        password: password
+      });
+
+      // Navigate to sign-in matrix upon successful ingestion
+      navigate('/signin');
+    } catch (err) {
+      setErrorMsg(err?.message || "!! ERROR: Telemetry submission failed !!");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -68,9 +88,9 @@ export default function PasswordSetPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={8}
                   required
+                  disabled={isSubmitting}
                 />
               </div>
-
               <div className="auth-input-group">
                 <label className="auth-input-label">Confirm Password</label>
                 <input 
@@ -83,8 +103,8 @@ export default function PasswordSetPage() {
                 />
               </div>
 
-              <button type="submit" className="btn-auth-deploy-action">
-                ACTIVATE ACCOUNT
+              <button type="submit" className="btn-auth-deploy-action" disabled={isSubmitting}>
+                {isSubmitting ? "ACTIVATING..." : "ACTIVATE ACCOUNT"}
               </button>
 
             </form>

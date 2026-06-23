@@ -2,7 +2,12 @@ package com.deepsea.deep_sea.mapper;
 
 import com.deepsea.deep_sea.dto.ResearchAreaRequestDTO;
 import com.deepsea.deep_sea.dto.ResearchAreaResponseDTO;
+import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.ResearchArea;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +26,7 @@ public class ResearchAreaMapper {
                 .build();
     }
 
-    public ResearchAreaResponseDTO toResponseDTO(ResearchArea area, long missions, long species, long samples) {
+    public ResearchAreaResponseDTO toResponseDTO(ResearchArea area) {
         if (area == null) return null;
 
         return ResearchAreaResponseDTO.builder()
@@ -32,9 +37,6 @@ public class ResearchAreaMapper {
                 .longitude(area.getLongitude())
                 .description(area.getDescription())
                 .imageUrl(area.getImageUrl())
-                .totalMissionsLogged(missions)
-                .totalSpeciesIdentified(species)
-                .totalSamplesCollected(samples)
                 .build();
     }
 }

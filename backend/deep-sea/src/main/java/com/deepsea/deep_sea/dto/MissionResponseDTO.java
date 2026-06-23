@@ -22,11 +22,9 @@ public class MissionResponseDTO {
     private String researchAreaName;
     private String imageUrl;
     
-    // Summary data for tables and overview displays
-    private List<String> speciesObserved;
     private long totalSamplesLogged;
 
-    // Added detailed collections
+    // detailed collections
     private List<SampleResponseDTO> samples;
-    private List<SpeciesResponseDTO> detailedSpecies; 
+    private List<SpeciesResponseDTO> species; 
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,12 +25,15 @@ public class MissionRequestDTO {
     private String status; 
     private String description;
 
-    @NotNull(message = "A lead researcher ID must be assigned")
     private UUID leadResearcherId;
 
     @NotNull(message = "A target research area ID must be assigned")
     private UUID researchAreaId;
     
     private String imageUrl;
+    
+    private List<UUID> sampleIds;
+
+    private List<UUID> speciesIds;
     
 }

@@ -21,12 +21,4 @@ public interface ResearchAreaRepository extends JpaRepository<ResearchArea, UUID
     @Query(value = "SELECT r FROM ResearchArea r", countQuery = "SELECT COUNT(r) FROM ResearchArea r")
     Page<ResearchArea> findAllPaginated(Pageable pageable);
 
-    @Query("SELECT COUNT(m) FROM Mission m WHERE m.researchArea.id = :areaId")
-    long countMissionsByAreaId(@Param("areaId") UUID areaId);
-
-    @Query("SELECT COUNT(DISTINCT s) FROM Species s WHERE s.mission.researchArea.id = :areaId")
-    long countSpeciesByAreaId(@Param("areaId") UUID areaId);
-
-    @Query("SELECT COUNT(sm) FROM Sample sm WHERE sm.mission.researchArea.id = :areaId")
-    long countSamplesByAreaId(@Param("areaId") UUID areaId);
 }

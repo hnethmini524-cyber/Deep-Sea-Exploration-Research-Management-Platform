@@ -19,6 +19,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     
     Page<User> findAllByRole(UserRole role, Pageable pageable);
 
-    @Query("SELECT m.codeName FROM Mission m WHERE m.leadResearcher.id = :userId")
-    List<String> findAssignedMissionNamesByUserId(@Param("userId") UUID userId);
 }

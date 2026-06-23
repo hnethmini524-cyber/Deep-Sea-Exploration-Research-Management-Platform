@@ -8,15 +8,15 @@ import java.util.UUID;
 
 @Data
 public class SampleRequestDTO {
+	
+	@NotBlank(message = "Sample identification name is required")
+	private String sampleCode;
 
     @NotBlank(message = "Sample type is required")
     private String type; 
 
     @NotNull(message = "Collection timestamp is required")
     private LocalDateTime collectionDate;
-
-    @NotNull(message = "Associated Mission ID is required")
-    private UUID missionId;
 
     private double depth; 
 

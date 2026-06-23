@@ -15,25 +15,28 @@ import java.util.UUID;
 @Repository
 public interface MissionRepository extends JpaRepository<Mission, UUID> {
 
-    @Query(value = "SELECT m FROM Mission m " +
-                   "JOIN FETCH m.leadResearcher " +
-                   "JOIN FETCH m.researchArea",
-           countQuery = "SELECT COUNT(m) FROM Mission m")
+	@Query(value = "SELECT m FROM Mission m " +
+            "JOIN FETCH m.leadResearcher " +
+            "JOIN FETCH m.researchArea",
+    countQuery = "SELECT COUNT(m) FROM Mission m")
     Page<Mission> findAllPaginated(Pageable pageable);
 
-    @Query("SELECT COUNT(s) FROM Sample s WHERE s.mission.id = :missionId")
-    long countSamplesByMissionId(@Param("missionId") UUID missionId);
+    @Query("SELECT COUNT(s) FROM Mission m JOIN m.samples s WHERE m.id = :id")
+    long countSamplesByMissionId(@Param("id") UUID id);
     
     @Query("SELECT m FROM Mission m JOIN FETCH m.leadResearcher JOIN FETCH m.researchArea WHERE m.id = :id")
     Optional<Mission> findByIdWithAssociations(@Param("id") UUID id);
 
-    // Join for species collection
-    @Query("SELECT m FROM Mission m LEFT JOIN FETCH m.species WHERE m.id = :id")
-    Optional<Mission> findByIdWithSpecies(@Param("id") UUID id);
-
-    // Join for samples collection
-    @Query("SELECT m FROM Mission m LEFT JOIN FETCH m.samples WHERE m.id = :id")
-    Optional<Mission> findByIdWithSamples(@Param("id") UUID id);
+    @Query("""
+    		SELECT DISTINCT m
+    		FROM Mission m
+    		LEFT JOIN FETCH m.leadResearcher
+    		LEFT JOIN FETCH m.researchArea
+    		LEFT JOIN FETCH m.samples
+    		LEFT JOIN FETCH m.species
+    		WHERE m.id = :id
+    		""")
+    		Optional<Mission> findDetailedMission(@Param("id") UUID id);
 
     @Query(value = "SELECT * FROM missions ORDER BY launch_date DESC LIMIT 10", nativeQuery = true)
     List<Mission> findTop10RecentMissions();

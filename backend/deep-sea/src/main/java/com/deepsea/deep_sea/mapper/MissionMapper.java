@@ -1,7 +1,9 @@
 package com.deepsea.deep_sea.mapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.deepsea.deep_sea.dto.MissionRequestDTO;
 import com.deepsea.deep_sea.dto.MissionResponseDTO;
@@ -63,14 +65,13 @@ public class MissionMapper {
                 .status(mission.getStatus())
                 .description(mission.getDescription())
                 .imageUrl(mission.getImageUrl())
-                .leadResearcherId(mission.getLeadResearcher().getId())
-                .leadResearcherName(mission.getLeadResearcher().getName())
+                .leadResearcherId(mission.getLeadResearcher() != null ? mission.getLeadResearcher().getId(): null)
+                .leadResearcherName(mission.getLeadResearcher() != null? mission.getLeadResearcher().getName(): "Unassigned")
                 .researchAreaId(mission.getResearchArea().getId())
                 .researchAreaName(mission.getResearchArea().getAreaName())
-                .speciesObserved(speciesNames)
                 .totalSamplesLogged(totalSamplesCount)
-                .samples(sampleDTOs)      
-                .detailedSpecies(speciesDTOs) 
+                .samples(sampleDTOs)   
+                .species(speciesDTOs) 
                 .build();
     }
 }

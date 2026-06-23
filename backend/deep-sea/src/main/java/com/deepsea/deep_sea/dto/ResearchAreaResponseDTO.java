@@ -3,6 +3,8 @@ package com.deepsea.deep_sea.dto;
 //import com.deepsea.deep_sea.model.ResearchArea;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,8 +18,4 @@ public class ResearchAreaResponseDTO {
     private String description;
     private String imageUrl; 
 
-    // System requirements metrics 
-    private long totalMissionsLogged;
-    private long totalSpeciesIdentified;
-    private long totalSamplesCollected;
 }

@@ -6,6 +6,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
 
   // Determine context configuration: 'species' | 'sample' | 'mission' | 'research_area'
   const currentContext = assetData.dataType || 'mission';
+  const nameLabel = assetData.areaName || assetData.name || assetData.missionName || "Active Sector";
 
   // Define dynamic navigation tabs for each domain registry view
   const getTabsByContext = () => {
@@ -14,7 +15,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'sample':
         return ['Overview', 'Observations'];
       case 'research_area':
-        return ['Overview', 'Missions', 'Species Found', 'Samples Collected'];
+        return ['Overview'];
       case 'mission':
       default:
         return ['Overview', 'Researchers', 'Species Observed', 'Samples Collected'];
@@ -50,7 +51,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Assigned Command Staff:</p>
-            <p className="monospace-text">{assetData.assignedResearcher || "Dr. Alan Watson (Lead Hydro-Biologist)"}</p>
+            <p className="monospace-text">{assetData.assignedResearcher || "Telemetry link active. Operational personnel logs assigned to secure ledger."}</p>
           </div>
         );
 
@@ -59,7 +60,9 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Biological Taxa Log Matrix:</p>
-            <p className="monospace-text">{assetData.speciesObserved || assetData.speciesFound || "Bathypelagic Siphonophore clusters detected inside proximity bounds."}</p>
+            <p className="monospace-text">
+              {assetData.speciesObserved || assetData.speciesFound || `No localized biotope samples recorded yet inside bounds of node: ${nameLabel}.`}
+            </p>
           </div>
         );
 
@@ -67,7 +70,9 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Ledger Logs:</p>
-            <p className="monospace-text">{assetData.samplesCollected || "Sample-ID #7792: 4.2L Fluid environmental matrix extraction."}</p>
+            <p className="monospace-text">
+              {assetData.samplesCollected || `No structural sample extractions archived for sector: ${nameLabel}.`}
+            </p>
           </div>
         );
 
@@ -75,7 +80,9 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Associated Tactical Deployments:</p>
-            <p className="monospace-text">{assetData.missions || "Operation Trench Run, Bathymetric Sonar Topography Sweep Phase 1."}</p>
+            <p className="monospace-text">
+              {assetData.missions || `No deep-sea operational deployment logs matching area registry criteria for ${nameLabel}.`}
+            </p>
           </div>
         );
 
@@ -173,10 +180,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                     <span className="meta-ledger-value">[{assetData.scientificName || "N/A"}]</span>
                   </div>
                   <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">OPERATION MISSION</span>
-                    <span className="meta-ledger-value text-info">[{assetData.missionName || "N/A"}]</span>
-                  </div>
-                  <div className="meta-ledger-row">
                     <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
                     <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0m"}]</span>
                   </div>
@@ -197,10 +200,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">MATERIAL CLASSIFICATION</span>
                     <span className="meta-ledger-value">[{assetData.name || "Raw Core"}]</span>
-                  </div>
-                  <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">OPERATION MISSION</span>
-                    <span className="meta-ledger-value text-info">[{assetData.missionName || "N/A"}]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
@@ -226,7 +225,10 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">TARGET GPS COORDINATES</span>
-                    <span className="meta-ledger-value text-info monospace-text">[{assetData.coordinates || "0.000° N, 0.000° E"}]</span>
+                    <span className="meta-ledger-value text-info monospace-text">
+                      {/* Fixed: Dynamically renders real latitude/longitude properties from your schema */}
+                      [{assetData.latitude !== undefined && assetData.longitude !== undefined ? `${assetData.latitude}° N, ${assetData.longitude}° E` : "0.000° N, 0.000° E"}]
+                    </span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">ACTIVE MISSIONS DEPLOYED</span>

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpeciesMapper {
 
-    public Species toEntity(SpeciesRequestDTO dto, Mission mission) {
+    public Species toEntity(SpeciesRequestDTO dto) {
         if (dto == null) return null;
 
         return Species.builder()
@@ -20,7 +20,6 @@ public class SpeciesMapper {
                 .description(dto.getDescription())
                 .depth(dto.getDepth())
                 .observations(dto.getObservations().trim())
-                .mission(mission)
                 .build();
     }
 
@@ -36,7 +35,6 @@ public class SpeciesMapper {
                 .description(species.getDescription())
                 .depth(species.getDepth())
                 .observations(species.getObservations())
-                .missionId(species.getMission() != null ? species.getMission().getId() : null)
                 .build();
     }
 }

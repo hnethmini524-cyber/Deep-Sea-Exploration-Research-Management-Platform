@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import com.deepsea.deep_sea.model.enums.SampleType;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -17,6 +19,9 @@ public class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    
+    @Column(name = "sample_code", nullable = false, unique = true, length = 50)
+    private String sampleCode; // e.g., "SAMP-2026-0042", "BIO-DEEP-01"
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -33,10 +38,9 @@ public class Sample {
     
     @Column(name = "image_url", length = 512)
     private String imageUrl; 
+    
+    @ManyToMany(mappedBy = "samples")
+    @Builder.Default
+    private List<Mission> missions = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mission_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Mission mission;
 }

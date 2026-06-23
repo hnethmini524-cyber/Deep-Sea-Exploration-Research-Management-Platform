@@ -3,89 +3,83 @@ import AssetDetailViewer from '../components/AssetDetailViewer';
 import Pagination from '../components/Pagination'; 
 import UnifiedRegistryForm from '../components/UnifiedRegistryForm';
 import { FORM_SCHEMAS } from '../formSchemas';
+import { apiService } from '../service/apiService';
 import '../styles/research_areas_page.css';
-
-const MOCK_AREAS = [
-  {
-    id: "AREA-01",
-    name: "Mariana North Vent Sector",
-    region: "Western Pacific Ocean",
-    coordinates: "11.3493° N, 142.1996° E",
-    description: "Deep-sea hydrothermal vent fields harboring specialized chemosynthetic ecosystems and anomalous mineral crust formations.",
-    activeMissionsCount: 2,
-    missions: "Operation Trench Run, Hydrothermal Vent Probe Alpha.",
-    speciesFound: "Magnapinna sp., Alviniconcha scale-snails, Bathymodiolus clusters.",
-    samplesCollected: "SMP-902 (Sulfide Chimney Crust), SMP-104 (Hydrothermal Fluid Entry).",
-    imageUrl: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: "AREA-02",
-    name: "Abyssal Plain Sub-System 7",
-    region: "Puerto Rico Trench Suffix",
-    coordinates: "19.5000° N, 66.7500° W",
-    description: "Flat pelagic sediment zones optimized for core soil extractions and micro-seismic acoustic monitoring arrays.",
-    activeMissionsCount: 1,
-    missions: "Anoxic Basin Scan Phase II.",
-    speciesFound: "Benthocodon Jelly isolates, Abyssal Holothurians.",
-    samplesCollected: "SMP-903 (Abyssal Brine Matrix).",
-    imageUrl: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?auto=format&fit=crop&w=1000&q=80"
-  }
-];
 
 export default function ResearchAreasPage() {
   const [researchAreas, setResearchAreas] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   
-  // Pagination Config
+  // Server-side Pagination Configuration (Spring Boot pages start at index 0)
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
   const itemsPerPage = 6; 
 
+  const fetchResearchAreasFromBackend = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await apiService.getResearchAreas(currentPage - 1, itemsPerPage, searchQuery);
+      
+      // Map the backend Page properties to frontend state variables
+      setResearchAreas(data.content || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalElements(data.totalElements || 0);
+    } catch (err) {
+      console.error("❌ Failed to fetch telemetry from deployment engine:", err);
+      setError("Failed to synchronize data matrix with database core.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setResearchAreas(MOCK_AREAS);
-  }, []);
+    fetchResearchAreasFromBackend();
+  }, [currentPage, searchQuery]);
 
   const handleCardClick = (area) => {
     setSelectedAsset({
       ...area,
       dataType: 'research_area', 
-      areaName: area.name        
+      areaName: area.areaName || area.name, 
+      description: area.description
     });
     setIsDossierOpen(true);
   };
 
-  // Process incoming dynamic fields down to list elements state arrays
-  const handleCreateAreaSubmit = (formData) => {
-    const generatedIdNum = researchAreas.length + 1;
-    const newAreaNode = {
-      id: `AREA-${generatedIdNum < 10 ? '0' + generatedIdNum : generatedIdNum}`,
-      name: formData.areaName || 'Unspecified Sector Node',
-      region: formData.region || 'Unknown Waters Coordinates',
-      coordinates: formData.coordinates || '0.0000° N, 0.0000° E',
-      description: formData.description || 'No baseline environmental telemetry logs entered.',
-      activeMissionsCount: formData.activeMissions ? (Array.isArray(formData.activeMissions) ? formData.activeMissions.length : 1) : 0,
-      missions: Array.isArray(formData.activeMissions) ? formData.activeMissions.join(', ') : (formData.activeMissions || 'Independent Ops'),
-      speciesFound: Array.isArray(formData.speciesObserved) ? formData.speciesObserved.join(', ') : 'None Documented',
-      samplesCollected: Array.isArray(formData.samplesCollected) ? formData.samplesCollected.join(', ') : 'None Contained',
-      imageUrl: formData.image ? URL.createObjectURL(formData.image) : "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?auto=format&fit=crop&w=1000&q=80"
-    };
+  const handleCreateAreaSubmit = async (formData) => {
+    setError(null);
+    try {
+      let uploadedImageUrl = null;
+      if (formData.image) {
+        uploadedImageUrl = await apiService.uploadImage(formData.image);
+      }
+      
+      const newPayload = {
+        areaName: formData.areaName,
+        region: formData.region,
+        description: formData.description,
+        latitude: parseFloat(formData.latitude) || 0.0,
+        longitude: parseFloat(formData.longitude) || 0.0,
+        imageUrl: uploadedImageUrl
+      };
 
-    setResearchAreas([newAreaNode, ...researchAreas]);
-    setIsFormOpen(false);
+      await apiService.createResearchArea(newPayload);
+    
+      setIsFormOpen(false);
+      setCurrentPage(1); 
+      fetchResearchAreasFromBackend();
+    } catch (err) {
+      console.error("❌ Data save transmission failure:", err);
+      setError("Could not write record block to remote ledger instance.");
+    }
   };
-
-  const filteredAreas = researchAreas.filter(area => 
-    area.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    area.region.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAreas.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredAreas.length / itemsPerPage);
 
   return (
     <div className="research-areas-layout-root">
@@ -118,44 +112,64 @@ export default function ResearchAreasPage() {
           </div>
         </div>
 
+        {error && (
+          <div className="alert alert-danger font-monospace small mb-4 bg-dark text-danger border-danger">
+            ⚠️ SYSTEM ERROR: {error}
+          </div>
+        )}
+
         {/* Dashboard workspace grid */}
         <div className="areas-cards-dossier-grid">
-          {currentItems.map((area) => (
-            <div 
-              key={area.id} 
-              className="area-dossier-item-card"
-              onClick={() => handleCardClick(area)}
-            >
-              <div className="card-header-accent-strip d-flex justify-content-between">
-                <span className="card-node-id font-monospace">{area.id}</span>
-                <span className="card-status-indicator-pill">SECURED LEDGER</span>
-              </div>
-              
-              <div className="card-body-content-pane">
-                <h3 className="card-title-heading text-truncate">{area.name}</h3>
-                
-                <div className="metadata-ledger-row-compact">
-                  <span className="compact-key">REGION:</span>
-                  <span className="compact-value">{area.region}</span>
-                </div>
-                
-                <div className="metadata-ledger-row-compact">
-                  <span className="compact-key">COORDINATES:</span>
-                  <span className="compact-value text-info font-monospace">{area.coordinates}</span>
-                </div>
-
-                <p className="card-narrative-summary-text">
-                  {area.description}
-                </p>
-              </div>
-
-              <div className="card-footer-action-strip monospace-text">
-                &gt; VIEW DETAILED ENVIRONMENTAL DOSSIER
-              </div>
+          {loading ? (
+            <div className="w-100 p-5 text-center font-monospace text-info animate-pulse">
+              📡 DOWNLINK ACTIVE: STREAMING TARGET METRICS...
             </div>
-          ))}
+          ) : (
+            researchAreas.map((area) => (
+              <div 
+                key={area.id} 
+                className="area-dossier-item-card"
+                onClick={() => handleCardClick(area)}
+              >
+                <div className="card-header-accent-strip d-flex justify-content-between">
+                  <span className="card-node-id font-monospace">ACTIVE NODE</span>
+                  <span className="card-status-indicator-pill">SECURED LEDGER</span>
+                </div>
+                
+                <div className="card-body-content-pane">
+                  <h3 className="card-title-heading text-truncate">{area.areaName}</h3>
+                  
+                  <div className="metadata-ledger-row-compact">
+                    <span className="compact-key">REGION:</span>
+                    <span className="compact-value">{area.region}</span>
+                  </div>
+                  
+                  <div className="metadata-ledger-row-compact">
+                    <span className="compact-key">Latitude COORDINATES:</span>
+                    <span className="compact-value text-info font-monospace">
+                      {area.latitude}° N
+                    </span>
+                  </div>
+                  <div className="metadata-ledger-row-compact">
+                    <span className="compact-key">Longitude COORDINATES:</span>
+                    <span className="compact-value text-info font-monospace">
+                      {area.longitude}° E
+                    </span>
+                  </div>
 
-          {filteredAreas.length === 0 && (
+                  <p className="card-narrative-summary-text">
+                    {area.description}
+                  </p>
+                </div>
+
+                <div className="card-footer-action-strip monospace-text">
+                  &gt; VIEW DETAILED ENVIRONMENTAL DOSSIER
+                </div>
+              </div>
+            ))
+          )}
+
+          {!loading && researchAreas.length === 0 && (
             <div className="empty-state-notice-box w-100 p-5 text-center font-monospace text-muted">
               !! NO REGISTRY MATCHES FOUND INSIDE ACTIVE ARCHIVE BUFFER !!
             </div>

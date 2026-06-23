@@ -79,28 +79,44 @@ export default function UnifiedRegistryForm({
                       required={field.required}
                       onChange={(e) => handleInputChange(field.name, e.target.value)}
                     >
-                      <option value="">-- SELECT SECTOR PARAMETER --</option>
-                      {field.options.map(opt => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
+                      <option value="">-- SELECT PARAMETER (OPTIONAL) --</option>
+                      {field.options.map(opt => {
+                        // Check if options are objects containing structured payload keys (e.g., id and name)
+                        const optionId = typeof opt === 'object' ? opt.id : opt;
+                        const optionLabel = typeof opt === 'object' ? opt.name : opt;
+                        
+                        return (
+                          <option key={optionId} value={optionId}>
+                            {optionLabel}
+                          </option>
+                        );
+                      })}
                     </select>
                   )}
 
                   {/* File attachment */}
                   {field.type === 'file' && (
                     <div className="custom-file-upload-wrapper position-relative">
-                      <label className="btn-mission-cell-trigger w-100 justify-content-center py-2 font-monospace">
+                      <label className="btn-mission-cell-trigger w-100 justify-content-center py-2 font-monospace" style={{ cursor: 'pointer' }}>
                         <Upload size={14} className="me-2" /> 
                         {formData[field.name] ? 'Replace Selected Media Asset' : 'Upload Image File'}
                         <input 
                           type="file" 
                           className="d-none" 
-                          onChange={(e) => handleInputChange(field.name, e.target.files[0])} 
+                          accept="image/*" // Restricts input nodes to valid media files only
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              handleInputChange(field.name, e.target.files[0]);
+                            }
+                          }} 
                         />
                       </label>
+                      
                       {formData[field.name] && (
                         <div className="text-success text-center small font-monospace mt-1">
-                          ✓ {formData[field.name]?.name || "Attached_Asset_Stream"}
+                          ✓ {typeof formData[field.name] === 'string' 
+                              ? "Current_Stored_Asset_URL" 
+                              : (formData[field.name]?.name || "Attached_Asset_Stream")}
                         </div>
                       )}
                     </div>
@@ -121,11 +137,16 @@ export default function UnifiedRegistryForm({
                         }}
                       >
                         {field.options && field.options.length > 0 ? (
-                          field.options.map(opt => (
-                            <option key={opt} value={opt} className="multiselect-node-item p-2 my-1 rounded">
-                              {opt}
-                            </option>
-                          ))
+                          field.options.map(opt => {
+                            const optionId = typeof opt === "object" ? opt.id : opt;
+                            const optionLabel = typeof opt === "object" ? opt.name : opt;
+
+                            return (
+                              <option key={optionId} value={optionId}>
+                                {optionLabel}
+                              </option>
+                            );
+                          })
                         ) : (
                           <option disabled className="text-muted italic small text-center pt-4">
                             -- No active telemetry nodes detected --

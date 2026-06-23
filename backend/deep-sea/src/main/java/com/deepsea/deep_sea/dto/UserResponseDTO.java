@@ -5,7 +5,6 @@ import com.deepsea.deep_sea.model.enums.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,6 +17,4 @@ public class UserResponseDTO {
     private String specialization;
     private String institution;
     private boolean enabled;
-    
-    private List<String> assignedMissionNames;
 }

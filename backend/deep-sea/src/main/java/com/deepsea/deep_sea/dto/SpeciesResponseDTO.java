@@ -17,5 +17,4 @@ public class SpeciesResponseDTO {
     private double depth;
     private String observations;
     
-    private UUID missionId;
 }

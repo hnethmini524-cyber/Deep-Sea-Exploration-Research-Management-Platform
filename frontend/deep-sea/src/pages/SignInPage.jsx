@@ -1,13 +1,40 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { apiService } from '../service/ApiService';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    console.log("Authenticating operator parameters:", { email, password });
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      // Persist access token context safely
+      const response = await apiService.login({ email, password });
+
+        localStorage.setItem('token', response.token);
+
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            name: response.name,
+            email: response.email,
+            role: response.role
+          })
+        );
+
+      navigate('/researchers'); 
+    } catch (err) {
+      setError(err?.message || "Authentication rejected: Invalid operational credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -32,6 +59,12 @@ export default function SignInPage() {
               <p className="form-subtitle-caption">Enter your email and password to sign in</p>
             </div>
 
+            {error && (
+              <div className="alert alert-danger font-monospace text-center py-2 small bg-danger bg-opacity-10 border border-danger border-opacity-20 text-danger rounded mb-3">
+                !! AUTH_FAILURE: {error} !!
+              </div>
+            )}
+
             <form onSubmit={handleSignInSubmit} className="interactive-auth-form">
               
               <div className="auth-input-group">
@@ -42,6 +75,7 @@ export default function SignInPage() {
                   placeholder="Your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -54,12 +88,17 @@ export default function SignInPage() {
                   placeholder="Your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
 
-              <button type="submit" className="btn-auth-deploy-action">
-                SIGN IN
+              <button 
+                type="submit" 
+                className="btn-auth-deploy-action" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
               </button>
 
             </form>

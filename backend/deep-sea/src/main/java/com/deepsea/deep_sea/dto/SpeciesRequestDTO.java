@@ -33,5 +33,4 @@ public class SpeciesRequestDTO {
     
     private String imageUrl;
     
-    private UUID missionId;
 }

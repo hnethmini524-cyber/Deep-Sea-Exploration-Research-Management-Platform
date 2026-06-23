@@ -9,6 +9,8 @@ import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -47,9 +49,7 @@ public class Species {
     @Column(length = 1000)
     private String description;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mission_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Mission mission;
+    @ManyToMany(mappedBy = "species")
+    @Builder.Default
+    private List<Mission> missions = new ArrayList<>();
 }

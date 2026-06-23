@@ -1,18 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Briefcase, Building2, UserCircle, Edit2, Zap, Target } from 'lucide-react';
 import UnifiedEditModal from '../components/UnifiedEditModal';
+import { apiService } from '../service/ApiService';
 
-// Mock session data for initial page render validation
-const INITIAL_OPERATOR_DOSSIER = {
-  id: 'DELTA-9',
-  name: 'Mark Johnson',
-  email: 'mark@node.local',
-  specialization: 'QUANTUM ASTRO-TELEMETRY',
-  institution: 'UK CAMPUS',
-  role: 'COMMANDER'
-};
-
-// Map text profiles to operational system icons
 const FIELD_ICONS = {
   name: <UserCircle size={18} className="text-white-50" />,
   email: <Mail size={18} className="text-info" />,
@@ -21,10 +11,29 @@ const FIELD_ICONS = {
 };
 
 export default function ProfilePage() {
-  const [operatorData, setOperatorData] = useState(INITIAL_OPERATOR_DOSSIER);
+  const [operatorData, setOperatorData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeEditField, setActiveEditField] = useState({ key: '', label: '', value: '' });
+
+  const user = localStorage.getItem('user') || 'me'; 
+
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await apiService.fetchUserProfile(user.id);
+        setOperatorData(data);
+      } catch (err) {
+        setError(err?.message || 'Failed to sync dossier parameters.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadProfileData();
+  }, [user]);
 
   const handleOpenEditModal = (key, label, value) => {
     setActiveEditField({ key, label, value });
@@ -36,11 +45,35 @@ export default function ProfilePage() {
     setActiveEditField({ key: '', label: '', value: '' });
   };
 
-  const handleSaveParameterUpdate = (key, newValue) => {
-    console.log(`Committing overwrite for ${key} parameter... New Value: ${newValue}`);
-    setOperatorData(prev => ({ ...prev, [key]: newValue }));
-    handleCloseModal();
+  const handleSaveParameterUpdate = async (key, newValue) => {
+    try {
+      const updatedPayload = { ...userData, [key]: newValue };
+      
+      // Hit backend evolution layer update endpoints matching DTO mapping structural profiles
+      const updatedData = await apiService.updateUserProfile(user, updatedPayload);
+      
+      setOperatorData(updatedData);
+      handleCloseModal();
+    } catch (err) {
+      alert(err?.message || "Dossier update execution fault.");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="profile-viewport-root d-flex align-items-center justify-content-center p-5 font-monospace text-info">
+        &gt; ESTABLISHING SECURE DATALINK MATRIX...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-viewport-root d-flex align-items-center justify-content-center p-5 font-monospace text-danger">
+        !! CRITICAL DOSSIER TELEMETRY SYNC ERROR: {error} !!
+      </div>
+    );
+  }
 
   return (
     <div className="profile-viewport-root">
@@ -51,9 +84,9 @@ export default function ProfilePage() {
           <div className="panel-header-segment">
             <h3 className="panel-main-title">Personal Operational Dossier</h3>
             <p className="panel-sub-label">
-              <span className="text-info font-monospace">{operatorData.id}</span>
+              <span className="text-info font-monospace">{userData?.id || 'UNASSIGNED'}</span>
               <span className="text-muted mx-2">|</span>
-              <span className="text-success">{operatorData.role}</span>
+              <span className="text-success">{userData?.role || 'FIELD OPERATOR'}</span>
               <span className="text-muted mx-2">|</span>
               <span className="text-muted-dim font-monospace">SESSION INDEX: ACTIVE</span>
             </p>
@@ -69,7 +102,7 @@ export default function ProfilePage() {
             { key: 'specialization', label: 'Primary Specialization', editable: false },
             { key: 'institution', label: 'Institutions Assigned', editable: true }
           ].map((field) => {
-            const currentValue = operatorData[field.key];
+            const currentValue = userData?.[field.key] || '';
             
             return (
               <div key={field.key} className="form-group-node profile-data-item w-100">
@@ -82,7 +115,7 @@ export default function ProfilePage() {
                   <div className="d-flex align-items-center gap-3 w-100 text-truncate">
                     {FIELD_ICONS[field.key]}
                     <span className="parameter-value-text font-monospace text-white flex-grow-1 text-truncate">
-                      {currentValue}
+                      {currentValue || 'N/A'}
                     </span>
                   </div>
 

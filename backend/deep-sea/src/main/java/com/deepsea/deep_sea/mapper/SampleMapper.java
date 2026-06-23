@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 @Component
 public class SampleMapper {
 
-    public Sample toEntity(SampleRequestDTO dto, Mission mission, SampleType type) {
+    public Sample toEntity(SampleRequestDTO dto, SampleType type) {
         if (dto == null) return null;
 
         return Sample.builder()
+        		.sampleCode(dto.getSampleCode())
                 .type(type)
                 .collectionDate(dto.getCollectionDate() != null ? dto.getCollectionDate() : LocalDateTime.now())
                 .depth(dto.getDepth())
                 .description(dto.getDescription() != null ? dto.getDescription().trim() : null)
-                .mission(mission)
                 .imageUrl(dto.getImageUrl() != null ? dto.getImageUrl().trim() : null)
                 .build();
     }
@@ -29,12 +29,12 @@ public class SampleMapper {
 
         return SampleResponseDTO.builder()
                 .sampleId(sample.getId())
+                .sampleCode(sample.getSampleCode())
                 .type(sample.getType())
                 .collectionDate(sample.getCollectionDate())
                 .depth(sample.getDepth())
                 .description(sample.getDescription())
                 .imageUrl(sample.getImageUrl())
-                .missionId(sample.getMission() != null ? sample.getMission().getId() : null)
                 .build();
     }
 }
