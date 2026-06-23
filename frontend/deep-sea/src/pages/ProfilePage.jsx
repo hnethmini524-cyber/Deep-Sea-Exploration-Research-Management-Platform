@@ -18,13 +18,30 @@ export default function ProfilePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeEditField, setActiveEditField] = useState({ key: '', label: '', value: '' });
 
-  const user = localStorage.getItem('user') || 'me'; 
+  // Parse out localStorage safely to access native fields
+  const getSessionUser = () => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.error("Failed to parse session profile vector context.", e);
+      return null;
+    }
+  };
 
   useEffect(() => {
     const loadProfileData = async () => {
+      const sessionUser = getSessionUser();
+      
+      if (!sessionUser || !sessionUser.id) {
+        setError('Authorization parameters are missing. Please sign in again.');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        const data = await apiService.fetchUserProfile(user.id);
+        const data = await apiService.fetchUserProfile(sessionUser.id);
         setOperatorData(data);
       } catch (err) {
         setError(err?.message || 'Failed to sync dossier parameters.');
@@ -32,8 +49,9 @@ export default function ProfilePage() {
         setIsLoading(false);
       }
     };
+
     loadProfileData();
-  }, [user]);
+  }, []);
 
   const handleOpenEditModal = (key, label, value) => {
     setActiveEditField({ key, label, value });
@@ -46,11 +64,17 @@ export default function ProfilePage() {
   };
 
   const handleSaveParameterUpdate = async (key, newValue) => {
+    const sessionUser = getSessionUser();
+    if (!sessionUser?.id) return;
+
     try {
-      const updatedPayload = { ...userData, [key]: newValue };
+      // Create request payload mapped directly against your backend UserUpdateDTO structure
+      const updatedPayload = { 
+        ...operatorData, 
+        [key]: newValue 
+      };
       
-      // Hit backend evolution layer update endpoints matching DTO mapping structural profiles
-      const updatedData = await apiService.updateUserProfile(user, updatedPayload);
+      const updatedData = await apiService.updateUserProfile(sessionUser.id, updatedPayload);
       
       setOperatorData(updatedData);
       handleCloseModal();
@@ -84,9 +108,9 @@ export default function ProfilePage() {
           <div className="panel-header-segment">
             <h3 className="panel-main-title">Personal Operational Dossier</h3>
             <p className="panel-sub-label">
-              <span className="text-info font-monospace">{userData?.id || 'UNASSIGNED'}</span>
+              <span className="text-info font-monospace">{operatorData?.id || 'UNASSIGNED'}</span>
               <span className="text-muted mx-2">|</span>
-              <span className="text-success">{userData?.role || 'FIELD OPERATOR'}</span>
+              <span className="text-success">{operatorData?.role || 'FIELD OPERATOR'}</span>
               <span className="text-muted mx-2">|</span>
               <span className="text-muted-dim font-monospace">SESSION INDEX: ACTIVE</span>
             </p>
@@ -102,7 +126,7 @@ export default function ProfilePage() {
             { key: 'specialization', label: 'Primary Specialization', editable: false },
             { key: 'institution', label: 'Institutions Assigned', editable: true }
           ].map((field) => {
-            const currentValue = userData?.[field.key] || '';
+            const currentValue = operatorData?.[field.key] || '';
             
             return (
               <div key={field.key} className="form-group-node profile-data-item w-100">
