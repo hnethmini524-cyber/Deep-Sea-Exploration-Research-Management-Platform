@@ -173,7 +173,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                 <>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">COMMON PROFILE NAME</span>
-                    <span className="meta-ledger-value text-truncate">[{assetData.name}]</span>
+                    <span className="meta-ledger-value text-truncate">[{assetData.commonName}]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">SCIENTIFIC NOMENCLATURE</span>
@@ -195,11 +195,11 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                 <>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">CORE SAMPLE ID</span>
-                    <span className="meta-ledger-value text-truncate">[{assetData.sampleId}]</span>
+                    <span className="meta-ledger-value text-truncate">[{assetData.sampleCode}]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">MATERIAL CLASSIFICATION</span>
-                    <span className="meta-ledger-value">[{assetData.name || "Raw Core"}]</span>
+                    <span className="meta-ledger-value">[{assetData.type || "Raw Core"}]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
@@ -207,7 +207,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">COLLECTION DATE STAMP</span>
-                    <span className="meta-ledger-value">[{assetData.date || "—"}]</span>
+                    <span className="meta-ledger-value">[{assetData.collectionDate || "—"}]</span>
                   </div>
                 </>
               )}

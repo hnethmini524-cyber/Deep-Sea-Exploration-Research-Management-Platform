@@ -107,8 +107,8 @@ export default function ObservationPage() {
     
       let uploadedImageUrl = null;
 
-      if (formData.image) {
-        uploadedImageUrl = await apiService.uploadImage(formData.image);
+      if (formData.imageUrl) {
+          uploadedImageUrl = await apiService.uploadImage(formData.imageUrl);
       }
       if (formConfig.type === 'SPECIES') {
       const speciesPayload = {

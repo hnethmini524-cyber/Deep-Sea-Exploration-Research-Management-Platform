@@ -57,9 +57,10 @@ export default function ResearchAreasPage() {
     setError(null);
     try {
       let uploadedImageUrl = null;
-      if (formData.image) {
-        uploadedImageUrl = await apiService.uploadImage(formData.image);
-      }
+      
+            if (formData.imageUrl) {
+                uploadedImageUrl = await apiService.uploadImage(formData.imageUrl);
+            }
       
       const newPayload = {
         areaName: formData.areaName,
