@@ -32,6 +32,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadProfileData = async () => {
       const sessionUser = getSessionUser();
+
+      console.log("SESSION USER =", sessionUser);
       
       if (!sessionUser || !sessionUser.id) {
         setError('Authorization parameters are missing. Please sign in again.');
@@ -41,7 +43,7 @@ export default function ProfilePage() {
 
       try {
         setIsLoading(true);
-        const data = await apiService.fetchUserProfile(sessionUser.id);
+        const data = await apiService.fetchUserProfile();
         setOperatorData(data);
       } catch (err) {
         setError(err?.message || 'Failed to sync dossier parameters.');

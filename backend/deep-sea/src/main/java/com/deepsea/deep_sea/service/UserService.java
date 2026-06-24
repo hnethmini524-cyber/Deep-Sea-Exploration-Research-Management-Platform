@@ -47,20 +47,25 @@ public class UserService {
 
     // Edit profile parameters restricted ONLY to email and institution 
     @Transactional
-    public UserResponseDTO updateProfile(UUID id, UserUpdateDTO dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Personnel account profile not found."));
+    public UserResponseDTO updateProfileByEmail(String email, UserUpdateDTO dto) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Personnel account profile not found."));
 
         String targetEmail = dto.getEmail().trim().toLowerCase();
-        
-        if (!user.getEmail().equals(targetEmail) && userRepository.findByEmail(targetEmail).isPresent()) {
-            throw new BadRequestException("Modification Canceled: Email variant tracking destination conflict.");
+
+        if (!user.getEmail().equals(targetEmail)
+                && userRepository.findByEmail(targetEmail).isPresent()) {
+            throw new BadRequestException(
+                    "Modification Canceled: Email variant tracking destination conflict.");
         }
 
         user.setEmail(targetEmail);
         user.setInstitution(dto.getInstitution().trim());
 
         User updatedUser = userRepository.save(user);
+
         return userMapper.toResponseDTO(updatedUser);
     }
 
@@ -82,5 +87,14 @@ public class UserService {
         missionRepository.saveAll(assignedMissions);
         
         userRepository.delete(user);
+    }
+    
+    public UserResponseDTO findUserByEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return userMapper.toResponseDTO(user);
     }
 }

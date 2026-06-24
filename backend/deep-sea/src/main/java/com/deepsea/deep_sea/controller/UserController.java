@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -42,18 +43,25 @@ public class UserController {
         return ResponseEntity.ok(userService.findPaginatedResearchers(pageable));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/me")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')")
-    public ResponseEntity<UserResponseDTO> getUserProfile(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.findUserById(id));
+    public ResponseEntity<UserResponseDTO> getUserProfile(Authentication authentication) {
+    	String email = authentication.getName();
+
+        return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/me")
     @PreAuthorize("hasAnyRole('ADMIN', 'RESEARCHER')")
     public ResponseEntity<UserResponseDTO> updateProfile(
-            @PathVariable UUID id, 
+            Authentication authentication,
             @Valid @RequestBody UserUpdateDTO updateDto) {
-        return ResponseEntity.ok(userService.updateProfile(id, updateDto));
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                userService.updateProfileByEmail(email, updateDto)
+        );
     }
 
     @DeleteMapping("/{id}")

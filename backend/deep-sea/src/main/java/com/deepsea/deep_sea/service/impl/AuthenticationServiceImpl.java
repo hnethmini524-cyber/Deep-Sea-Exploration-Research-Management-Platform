@@ -125,11 +125,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String jwt = generateToken(new DeepSeaUserDetails(user));
 
         return new AuthResponseDTO(
-                jwt,
-                user.getEmail(),
-                user.getRole(),
-                user.getName()
-        );
+        	    user.getId(),
+        	    jwt,
+        	    user.getEmail(),
+        	    user.getRole(),
+        	    user.getName()
+        	);
+        
     }
 
     @Override

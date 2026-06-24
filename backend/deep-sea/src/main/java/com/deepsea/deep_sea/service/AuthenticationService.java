@@ -4,6 +4,8 @@ import com.deepsea.deep_sea.dto.AuthResponseDTO;
 import com.deepsea.deep_sea.dto.PasswordSetupRequestDTO;
 import com.deepsea.deep_sea.dto.ResearcherInviteDTO;
 
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthenticationService {
