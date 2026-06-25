@@ -35,7 +35,7 @@ export default function ProfilePage() {
 
       console.log("SESSION USER =", sessionUser);
       
-      if (!sessionUser || !sessionUser.id) {
+      if (!sessionUser) {
         setError('Authorization parameters are missing. Please sign in again.');
         setIsLoading(false);
         return;
@@ -66,24 +66,21 @@ export default function ProfilePage() {
   };
 
   const handleSaveParameterUpdate = async (key, newValue) => {
-    const sessionUser = getSessionUser();
-    if (!sessionUser?.id) return;
-
     try {
-      // Create request payload mapped directly against your backend UserUpdateDTO structure
       const updatedPayload = { 
         ...operatorData, 
         [key]: newValue 
       };
       
-      const updatedData = await apiService.updateUserProfile(sessionUser.id, updatedPayload);
+      const updatedData = await apiService.updateUserProfile(updatedPayload);
       
       setOperatorData(updatedData);
       handleCloseModal();
     } catch (err) {
+      console.error("Profile synchronization breakdown:", err);
       alert(err?.message || "Dossier update execution fault.");
     }
-  };
+};
 
   if (isLoading) {
     return (

@@ -20,14 +20,15 @@ export default function SignInPage() {
 
         localStorage.setItem('token', response.token);
 
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            name: response.name,
-            email: response.email,
-            role: response.role
-          })
-        );
+          localStorage.setItem(
+            'user',
+            JSON.stringify({
+              id: response.id, 
+              name: response.name,
+              email: response.email,
+              role: response.role
+            })
+          );
 
       navigate('/researchers'); 
     } catch (err) {

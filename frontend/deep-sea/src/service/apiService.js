@@ -69,16 +69,6 @@ class ApiService {
   async login(credentials) {
     const response = await this.api.post('/auth/login', credentials);
     localStorage.setItem('token', response.data.token);
-
-    localStorage.setItem(
-        'user',
-        JSON.stringify({
-            id: response.data.id,
-            name: response.data.name,
-            email: response.data.email,
-            role: response.data.role
-        })
-    );
     return response.data;
   }
 
@@ -103,8 +93,8 @@ class ApiService {
     return response.data;
   }
 
-  async updateUserProfile(id, updateDto) {
-    const response = await this.api.put(`/users/${id}`, updateDto);
+  async updateUserProfile(updateDto) {
+    const response = await this.api.put('/users/me', updateDto);
     return response.data;
   }
 
