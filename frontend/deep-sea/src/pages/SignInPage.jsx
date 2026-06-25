@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { apiService } from '../service/ApiService';
 
-export default function SignInPage() {
+export default function SignInPage( { onLogin } ) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,19 +18,23 @@ export default function SignInPage() {
       // Persist access token context safely
       const response = await apiService.login({ email, password });
 
-        localStorage.setItem('token', response.token);
+                localStorage.setItem('token', response.token);
 
-          localStorage.setItem(
-            'user',
-            JSON.stringify({
-              id: response.id, 
-              name: response.name,
-              email: response.email,
-              role: response.role
-            })
-          );
+        const userData = {
+          id: response.id,
+          name: response.name,
+          email: response.email,
+          role: response.role
+        };
 
-      navigate('/researchers'); 
+        localStorage.setItem(
+          'user',
+          JSON.stringify(userData)
+        );
+
+        onLogin(userData);
+
+        navigate('/researchers');
     } catch (err) {
       setError(err?.message || "Authentication rejected: Invalid operational credentials.");
     } finally {
