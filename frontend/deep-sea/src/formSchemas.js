@@ -24,7 +24,7 @@ export const FORM_SCHEMAS = {
   SPECIES: [
     { name: 'commonName', label: 'Common Name', type: 'text', placeholder: 'e.g., Ghost Shark', required: true },
     { name: 'scientificName', label: 'Scientific Name', type: 'text', placeholder: 'e.g., Chimaera monstrosa', required: true },
-    { name: 'category', label: 'Category Classification', type: 'select', options: ['Benthos', 'Pelagic', 'Microbial', 'Anomalous'], required: true },
+    { name: 'category', label: 'Category Classification', type: 'text', placeholder: 'e.g., Chimaera monstrosa', required: true },
     { name: 'description', label: 'Biological Description', type: 'textarea' },
     { name: 'depth', label: 'Observed Depth Range (m)', type: 'number', placeholder: 'e.g., 3000' },
     { name: 'imageUrl', label: 'Specimen Capture Imagery', type: 'file' },

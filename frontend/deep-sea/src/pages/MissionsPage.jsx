@@ -182,7 +182,7 @@ export default function MissionsPage() {
             return {
               ...field,
               options: samples.content.map(s => ({
-                id: s.id,
+                id: s.sampleId,
                 name: s.sampleCode
               }))
             };
@@ -205,7 +205,7 @@ export default function MissionsPage() {
     setSelectedMission({
       ...mission,
       dataType: 'mission',
-      missionName: mission.missionName,
+      codeName: mission.codeName,
       startDate: mission.launchDate || mission.startDate, 
       endDate: mission.endDate,
       researchArea: mission.researchAreaName || mission.researchArea
@@ -213,18 +213,18 @@ export default function MissionsPage() {
     setIsDossierOpen(true);
   };
 
-  // 🚀 Write or Commit Object record payload updates down to system
   const handleFormSubmit = async (payload) => {
     setError(null);
     try {
       let uploadedImageUrl = null;
       
-            if (formData.imageUrl) {
-                uploadedImageUrl = await apiService.uploadImage(formData.imageUrl);
-            }
+      if (payload && payload.imageUrl) {
+        uploadedImageUrl = await apiService.uploadImage(payload.imageUrl);
+      }
+
       if (editingMission && selectedMission) {
         const updatePayload = {
-          missionName: payload.name,
+          codeName: payload.codeName,
           description: payload.description || 'No descriptions logged.',
           startDate: payload.startDate,
           endDate: payload.endDate || null,
@@ -234,7 +234,7 @@ export default function MissionsPage() {
         await apiService.updateMission(selectedMission.id, updatePayload);
       } else {
         const createPayload = {
-          codeName: payload.name,
+          codeName: payload.codeName,
           description: payload.description || 'No descriptions logged.',
           launchDate: payload.launchDate,
           completionDate: payload.completionDate || null,
@@ -268,7 +268,7 @@ export default function MissionsPage() {
 
   const handleEditClick = (mission) => {
     setEditingMission({
-      name: mission.missionName,
+      name: mission.codeName,
       description: mission.description,
       startDate: mission.launchDate || mission.startDate,
       endDate: mission.endDate || '',
@@ -338,12 +338,12 @@ export default function MissionsPage() {
                     <td className="table-body-cell data-cell-truncate text-muted">{mission.description}</td>
                     <td className="table-body-cell text-muted">{mission.launchDate || mission.startDate}</td>
                     <td className="table-body-cell text-muted">{mission.completionDate || '—'}</td>
-                    <td>
-                      <span className={`status-badge ${(mission.status === 'Done' || mission.status === 'Completed') ? 'done-glow' : mission.status === 'Canceled' ? 'canceled-glow' : 'working-glow'}`}>
+                    <td className="table-body-cell">
+                      <span className={`status-badge ${(mission.status === 'COMPLETED') ? 'done-glow' : mission.status === 'CANCELLED' ? 'canceled-glow' : 'working-glow'}`}>
                         {mission.status}
                       </span>
                     </td>
-                    <td className="table-body-cell text-info fw-bold">{mission.areaName || 'UNASSIGNED'}</td>
+                    <td className="table-body-cell text-info fw-bold">{mission.researchAreaName || 'UNASSIGNED'}</td>
                     <td className="table-body-cell text-center" onClick={(e) => e.stopPropagation()}>
                       <button type="button" className="btn-assign-researcher-node" onClick={() => handleRowSelection(mission)}>
                         View

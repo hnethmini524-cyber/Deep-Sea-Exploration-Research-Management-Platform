@@ -6,7 +6,9 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
 
   // Determine context configuration: 'species' | 'sample' | 'mission' | 'research_area'
   const currentContext = assetData.dataType || 'mission';
-  const nameLabel = assetData.areaName || assetData.name || assetData.missionName || "Active Sector";
+  
+  // Clean parameter fallback for handling component header layout labels
+  const nameLabel = assetData.codeName || assetData.areaName || assetData.name || assetData.missionName || "Active Sector";
 
   // Define dynamic navigation tabs for each domain registry view
   const getTabsByContext = () => {
@@ -25,7 +27,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
   const tabs = getTabsByContext();
   const [activeSubTab, setActiveSubTab] = useState('Overview');
 
-  // Reset tab active selection back to 'Overview' whenever a new item state maps in
   useEffect(() => {
     setActiveSubTab('Overview');
   }, [assetData]);
@@ -51,18 +52,43 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Assigned Command Staff:</p>
-            <p className="monospace-text">{assetData.assignedResearcher || "Telemetry link active. Operational personnel logs assigned to secure ledger."}</p>
+            <div className="p-3 border border-secondary rounded bg-dark bg-opacity-40 font-monospace">
+              <div className="mb-2">
+                <span className="text-muted small d-block" style={{ fontSize: '10px' }}>&gt; LEAD INVESTIGATOR</span>
+                <span className="text-white fw-bold fs-6">{assetData.leadResearcherName || "NO PERSONNEL ASSIGNED"}</span>
+              </div>
+              {assetData.leadResearcherId && (
+                <div className="text-muted" style={{ fontSize: '11px', opacity: 0.7 }}>
+                  UUID: {assetData.leadResearcherId}
+                </div>
+              )}
+            </div>
           </div>
         );
 
       case 'Species Observed':
-      case 'Species Found':
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Biological Taxa Log Matrix:</p>
-            <p className="monospace-text">
-              {assetData.speciesObserved || assetData.speciesFound || `No localized biotope samples recorded yet inside bounds of node: ${nameLabel}.`}
-            </p>
+            {assetData.species && assetData.species.length > 0 ? (
+              <div className="d-flex flex-column gap-2 overflow-auto pe-1" style={{ maxHeight: '200px' }}>
+                {assetData.species.map((specimen) => (
+                  <div key={specimen.id} className="p-2 border border-secondary rounded bg-black bg-opacity-30 d-flex justify-content-between align-items-center font-monospace">
+                    <div>
+                      <span className="text-info d-block fw-bold" style={{ fontSize: '13px' }}>{specimen.commonName}</span>
+                      <span className="text-muted small italic"><i>{specimen.scientificName}</i></span>
+                    </div>
+                    {specimen.category && (
+                      <span className="badge bg-secondary text-uppercase" style={{ fontSize: '10px' }}>{specimen.category}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="monospace-text text-muted">
+                No localized biotope samples recorded yet inside bounds of node: {nameLabel}.
+              </p>
+            )}
           </div>
         );
 
@@ -70,19 +96,32 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
         return (
           <div className="dossier-sub-list">
             <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Ledger Logs:</p>
-            <p className="monospace-text">
-              {assetData.samplesCollected || `No structural sample extractions archived for sector: ${nameLabel}.`}
-            </p>
-          </div>
-        );
-
-      case 'Missions':
-        return (
-          <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Associated Tactical Deployments:</p>
-            <p className="monospace-text">
-              {assetData.missions || `No deep-sea operational deployment logs matching area registry criteria for ${nameLabel}.`}
-            </p>
+            {assetData.samples && assetData.samples.length > 0 ? (
+              <div className="table-responsive border border-secondary rounded overflow-hidden" style={{ maxHeight: '200px' }}>
+                <table className="table table-dark table-sm font-monospace m-0 align-middle" style={{ fontSize: '12px' }}>
+                  <thead>
+                    <tr className="text-muted bg-black bg-opacity-50" style={{ fontSize: '10px' }}>
+                      <th className="p-2">CODE</th>
+                      <th className="p-2">CLASSIFICATION</th>
+                      <th className="p-2 text-end">DEPTH</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assetData.samples.map((sample) => (
+                      <tr key={sample.sampleId || sample.id} title={sample.description} className="border-top border-secondary">
+                        <td className="p-2 text-warning fw-bold">{sample.sampleCode}</td>
+                        <td className="p-2"><span className="badge bg-dark border border-secondary text-light">{sample.type}</span></td>
+                        <td className="p-2 text-end text-info">{sample.depth}m</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="monospace-text text-muted">
+                No structural sample extractions archived for sector: {nameLabel}.
+              </p>
+            )}
           </div>
         );
 
@@ -92,13 +131,13 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
   };
 
   return (
-    <div className="asset-dossier-overlay-backdrop">
-      <div className="asset-dossier-master-card">
+    <div className="asset-dossier-overlay-backdrop" onClick={onClose}>
+      <div className="asset-dossier-master-card" onClick={(e) => e.stopPropagation()}>
         
         {/* Top header pathway */}
         <div className="dossier-header-strip d-flex justify-content-between align-items-center">
           <div className="dossier-pathway-title monospace-text">
-            \\ {currentContext.replace('_', ' ').toUpperCase()} REGISTRY \ {(assetData.missionName || assetData.name || assetData.sampleId || assetData.areaName)?.toUpperCase()}
+            \\ {currentContext.replace('_', ' ').toUpperCase()} REGISTRY \ {nameLabel.toUpperCase()}
           </div>
           <button type="button" className="btn-close-dossier" onClick={onClose}>✕</button>
         </div>
@@ -136,33 +175,33 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
               {currentContext === 'mission' && (
                 <>
                   <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">MISSION NAME</span>
-                    <span className="meta-ledger-value text-truncate">
-                      [{assetData.missionName || assetData.name || "—"}]
+                    <span className="meta-ledger-key">MISSION CODE NAME</span>
+                    <span className="meta-ledger-value text-info fw-bold text-truncate">
+                      [{assetData.codeName || assetData.missionName || assetData.name || "—"}]
                     </span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">START DATE</span>
                     <span className="meta-ledger-value">
-                      [{assetData.startDate || assetData.start || "—"}]
+                      [{assetData.launchDate || assetData.startDate || "—"}]
                     </span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">END DATE</span>
                     <span className="meta-ledger-value">
-                      [{assetData.endDate || assetData.end || "—"}]
+                      [{assetData.completionDate || assetData.endDate || "—"}]
                     </span>
                   </div>
                   <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">STATUS</span>
-                    <span className="meta-ledger-value text-info fw-bold">
+                    <span className="meta-ledger-key">STATUS FLAG</span>
+                    <span className="meta-ledger-value text-success fw-bold">
                       [{(assetData.status || "PENDING").toUpperCase()}]
                     </span>
                   </div>
                   <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">RESEARCH AREA</span>
-                    <span className="meta-ledger-value text-warning fw-bold">
-                      [{assetData.researchArea || assetData.area || "—"}]
+                    <span className="meta-ledger-key">OPERATIONAL ZONE</span>
+                    <span className="meta-ledger-value text-warning fw-bold text-truncate">
+                      [{assetData.researchAreaName || assetData.researchArea || "UNASSIGNED"}]
                     </span>
                   </div>
                 </>
@@ -181,7 +220,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
-                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0m"}]</span>
+                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0"}m]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">TAXONOMIC CATEGORY</span>
@@ -203,7 +242,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">RECORDED EXTRACTION DEPTH</span>
-                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0m"}]</span>
+                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.depth || "0"}m]</span>
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">COLLECTION DATE STAMP</span>
@@ -225,8 +264,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                   </div>
                   <div className="meta-ledger-row">
                     <span className="meta-ledger-key">TARGET GPS COORDINATES</span>
-                    <span className="meta-ledger-value text-info monospace-text">
-                      {/* Fixed: Dynamically renders real latitude/longitude properties from your schema */}
+                    <span className="meta-ledger-value text-info font-monospace">
                       [{assetData.latitude !== undefined && assetData.longitude !== undefined ? `${assetData.latitude}° N, ${assetData.longitude}° E` : "0.000° N, 0.000° E"}]
                     </span>
                   </div>
@@ -245,6 +283,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             <div className="dossier-image-frame-container">
               <img 
                 src={assetData.imageUrl || "https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&w=1000&q=80"} 
+                srcSet={assetData.imageUrl ? undefined : undefined}
                 alt="Operational telemetry visual capture" 
                 className="dossier-main-display-graphic"
               />
