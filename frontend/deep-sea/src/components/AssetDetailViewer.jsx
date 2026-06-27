@@ -7,7 +7,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
   // Determine context configuration: 'species' | 'sample' | 'mission' | 'research_area'
   const currentContext = assetData.dataType || 'mission';
   
-  // Clean parameter fallback for handling component header layout labels
+  // Handling component header layout labels
   const nameLabel = assetData.codeName || assetData.areaName || assetData.name || assetData.missionName || "Active Sector";
 
   // Define dynamic navigation tabs for each domain registry view
@@ -54,7 +54,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             <p className="text-info-cyan fw-bold mb-2">✦ Assigned Command Staff:</p>
             <div className="p-3 border border-secondary rounded bg-dark bg-opacity-40 font-monospace">
               <div className="mb-2">
-                <span className="text-muted small d-block" style={{ fontSize: '10px' }}>&gt; LEAD INVESTIGATOR</span>
+                <span className="text-muted small d-block" style={{ fontSize: '10px' }}>&gt; LEAD RESEARCHER</span>
                 <span className="text-white fw-bold fs-6">{assetData.leadResearcherName || "NO PERSONNEL ASSIGNED"}</span>
               </div>
               {assetData.leadResearcherId && (
@@ -69,7 +69,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Species Observed':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Biological Taxa Log Matrix:</p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Biological Description:</p>
             {assetData.species && assetData.species.length > 0 ? (
               <div className="d-flex flex-column gap-2 overflow-auto pe-1" style={{ maxHeight: '200px' }}>
                 {assetData.species.map((specimen) => (

@@ -15,10 +15,9 @@ export default function SignInPage( { onLogin } ) {
       setIsLoading(true);
       setError('');
       
-      // Persist access token context safely
       const response = await apiService.login({ email, password });
 
-                localStorage.setItem('token', response.token);
+        localStorage.setItem('token', response.token);
 
         const userData = {
           id: response.id,

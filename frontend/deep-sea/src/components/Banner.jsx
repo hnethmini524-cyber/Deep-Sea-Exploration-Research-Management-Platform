@@ -29,12 +29,6 @@ export default function MissionHeroBanner({ onCreateMissionClick, onExportReport
 
         {/* Action buttons */}
         <div className="action-button-group d-flex flex-wrap gap-3">
-          <button 
-            onClick={onCreateMissionClick} 
-            className="btn-banner-primary"
-          >
-            Launch Mission <span className="ms-2">→</span>
-          </button>
           
         </div>
 
