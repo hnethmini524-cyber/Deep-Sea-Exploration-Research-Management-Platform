@@ -82,6 +82,11 @@ class ApiService {
     return response.data;
   }
 
+  async getDashboard() {
+    const response = await this.api.get('/dashboard');
+    return response.data;
+  }
+
   async fetchResearchers(page = 0, size = 6) {
     // Aligned with UserController mapping path: /api/v1/users/researchers
     const response = await this.api.get('/users/researchers', { params: { page, size } });

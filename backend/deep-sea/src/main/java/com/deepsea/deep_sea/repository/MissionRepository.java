@@ -42,4 +42,14 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
     List<Mission> findTop10RecentMissions();
     
     List<Mission> findAllByLeadResearcherId(UUID researcherId);
+    
+    @Query(value = """
+    		SELECT
+    		MONTH(launch_date) AS month,
+    		COUNT(*) AS total
+    		FROM missions
+    		GROUP BY MONTH(launch_date)
+    		ORDER BY MONTH(launch_date)
+    		""", nativeQuery = true)
+    		List<Object[]> countMissionLaunchesPerMonth();
 }

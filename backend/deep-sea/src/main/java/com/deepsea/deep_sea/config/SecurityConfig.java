@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/confirm").permitAll()
                         
+                        .requestMatchers(HttpMethod.GET, "/api/v1/dashboard").permitAll()
+                        
                         // Public details views (read-only)
                         .requestMatchers(HttpMethod.GET, "/api/v1/missions/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/areas/**").permitAll()
