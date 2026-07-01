@@ -78,20 +78,20 @@ export default function Dashboard({ allMissions = [] }) {
   ];
 
   const TELEMETRY_TIMELINE_DATA =
-  dashboardData.missionsPerMonth.map(item => ({
+    dashboardData.missionsPerMonth.map(item => ({
 
-      name:item.month,
+        name:item.month,
 
-      metrics:item.count
+        metrics:item.count
 
   }));
 
   const BAR_DISTRIBUTION_DATA =
-  dashboardData.sampleTypes.map(item => ({
+    dashboardData.sampleTypes.map(item => ({
 
-      group:item.type,
+        group:item.type,
 
-      volume:item.count
+        volume:item.count
 
   }));
 

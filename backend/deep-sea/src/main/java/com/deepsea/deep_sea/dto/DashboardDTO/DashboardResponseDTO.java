@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.deepsea.deep_sea.dto.MissionResponseDTO;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,5 +20,7 @@ public class DashboardResponseDTO {
     private List<MonthlyMissionDTO> missionsPerMonth;
 
     private List<SampleTypeDTO> sampleTypes;
+    
+    private List<MissionResponseDTO> recentMissions;
 
 }
