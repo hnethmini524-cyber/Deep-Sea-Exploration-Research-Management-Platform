@@ -38,8 +38,13 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
     		""")
     		Optional<Mission> findDetailedMission(@Param("id") UUID id);
 
-    @Query(value = "SELECT * FROM missions ORDER BY launch_date DESC LIMIT 10", nativeQuery = true)
-    List<Mission> findTop10RecentMissions();
+    @Query("""
+    		SELECT m
+    		FROM Mission m
+    		LEFT JOIN FETCH m.researchArea
+    		ORDER BY m.launchDate DESC
+    		""")
+    		List<Mission> findTop10RecentMissions(Pageable pageable);
     
     List<Mission> findAllByLeadResearcherId(UUID researcherId);
     

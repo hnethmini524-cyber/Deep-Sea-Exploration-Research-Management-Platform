@@ -1,12 +1,17 @@
 package com.deepsea.deep_sea.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.deepsea.deep_sea.dto.MissionResponseDTO;
+import com.deepsea.deep_sea.dto.DashboardDTO.DashboardMissionDTO;
 import com.deepsea.deep_sea.dto.DashboardDTO.DashboardResponseDTO;
 import com.deepsea.deep_sea.dto.DashboardDTO.DashboardSummaryDTO;
 import com.deepsea.deep_sea.dto.DashboardDTO.MonthlyMissionDTO;
 import com.deepsea.deep_sea.dto.DashboardDTO.SampleTypeDTO;
+import com.deepsea.deep_sea.model.Mission;
 import com.deepsea.deep_sea.model.enums.SampleType;
 import com.deepsea.deep_sea.model.enums.UserRole;
 import com.deepsea.deep_sea.repository.MissionRepository;
@@ -48,6 +53,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .summary(summary)
                 .missionsPerMonth(missionsPerMonth)
                 .sampleTypes(sampleTypes)
+                .recentMissions(buildRecentMissions())
                 .build();
     }
 
@@ -104,6 +110,41 @@ public class DashboardServiceImpl implements DashboardService {
 
                 .toList();
 
+    }
+    
+    private DashboardMissionDTO convertMission(Mission mission){
+
+        return DashboardMissionDTO.builder()
+
+                .id(mission.getId())
+
+                .codeName(mission.getCodeName())
+
+                .description(mission.getDescription())
+
+                .launchDate(mission.getLaunchDate())
+
+                .completionDate(mission.getCompletionDate())
+
+                .status(mission.getStatus().name())
+
+                .researchAreaName(
+                        mission.getResearchArea() != null
+                        ? mission.getResearchArea().getAreaName()
+                        : "N/A"
+                )
+
+                .build();
+
+    }
+    
+    private List<DashboardMissionDTO> buildRecentMissions() {
+
+        return missionRepository
+                .findTop10RecentMissions(PageRequest.of(0, 10))
+                .stream()
+                .map(this::convertMission)
+                .toList();
     }
 
 }

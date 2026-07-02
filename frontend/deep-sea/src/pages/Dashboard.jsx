@@ -184,10 +184,10 @@ export default function Dashboard({ allMissions = [] }) {
       <div className="row">
         <div className="col-12">
           {/* Renders the custom MissionsTable component*/}
-          <MissionsTable 
-            missionsData={allMissions} 
-            maxRows={10} 
-            onAssignResearcher={handleAssignPersonnel}
+          <MissionsTable
+              missionsData={dashboardData.recentMissions}
+              maxRows={10}
+              onAssignResearcher={handleAssignPersonnel}
           />
         </div>
       </div>

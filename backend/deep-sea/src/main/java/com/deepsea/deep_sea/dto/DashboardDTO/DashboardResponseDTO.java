@@ -21,6 +21,6 @@ public class DashboardResponseDTO {
 
     private List<SampleTypeDTO> sampleTypes;
     
-    private List<MissionResponseDTO> recentMissions;
+    private List<DashboardMissionDTO> recentMissions;
 
 }

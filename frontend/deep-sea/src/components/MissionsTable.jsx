@@ -41,7 +41,6 @@ export default function MissionsTable({ missionsData = [], maxRows, onAssignRese
               <th className="table-head-cell">END DATE</th>
               <th className="table-head-cell">STATUS</th>
               <th className="table-head-cell">RESEARCH AREA</th>
-              <th className="table-head-cell text-end">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
@@ -55,7 +54,7 @@ export default function MissionsTable({ missionsData = [], maxRows, onAssignRese
               displayedMissions.map((mission) => (
                 <tr key={mission.id || mission.missionId} className="table-body-row">
                   <td className="table-body-cell fw-bold text-white">
-                    {mission.missionName || "Unnamed Deployment"}
+                    {mission.codeName || "Unnamed Deployment"}
                   </td>
                   
                   <td className="table-body-cell text-muted small data-cell-truncate" title={mission.description}>
@@ -63,41 +62,23 @@ export default function MissionsTable({ missionsData = [], maxRows, onAssignRese
                   </td>
                   
                   <td className="table-body-cell text-white small">
-                    {mission.startDate || "N/A"}
+                    {mission.launchDate}
                   </td>
                   
                   <td className="table-body-cell text-white small">
-                    {mission.endDate || "In Progress"}
+                    {mission.completionDate || "In Progress"}
                   </td>
                   
                   <td className="table-body-cell">
-                    <span className={`badge rounded-pill px-3 py-2 ${getStatusBadgeClass(mission.status)}`}>
+                    <span className={`status-badge ${(mission.status === 'COMPLETED') ? 'done-glow' : mission.status === 'CANCELLED' ? 'canceled-glow' : 'working-glow'}`}>
                       {mission.status || "Unknown"}
                     </span>
                   </td>
                   
                   <td className="table-body-cell font-monospace text-info small">
-                    {mission.researchArea || "Unassigned"}
+                    {mission.researchAreaName}
                   </td>
                   
-                  <td className="table-body-cell text-end">
-                    <div className="d-inline-flex gap-2">
-                      <button 
-                        className="btn btn-action-icon" 
-                        onClick={() => onAssignResearcher?.(mission)}
-                        title="Assign Researcher"
-                      >
-                        <UserPlus size={14} color="#a0aec0" />
-                      </button>
-                      <button 
-                        className="btn btn-action-icon" 
-                        onClick={() => onViewDetails?.(mission)}
-                        title="View System Logs"
-                      >
-                        <Eye size={14} color="#00f2fe" />
-                      </button>
-                    </div>
-                  </td>
                 </tr>
               ))
             )}
