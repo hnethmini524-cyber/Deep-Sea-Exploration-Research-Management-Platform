@@ -112,9 +112,9 @@ export default function ResearcherPage() {
   const handleCreateResearcherSubmit = async (formData) => {
     try {
       const payload = {
-        name: formData.researcherName || 'Anonymous Operator',
+        name: formData.name,
         email: formData.email || 'unknown@domain.com',
-        specialization: formData.specialization || 'General Systems',
+        speacial: formData.speacial || 'General Systems',
         role: formData.role || 'Unassigned Field Asset',
         institution: formData.institution || 'Independent Agent'
       };
