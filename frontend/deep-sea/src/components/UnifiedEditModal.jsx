@@ -20,7 +20,7 @@ export default function UnifiedEditModal({ isOpen, fieldLabel, currentValue, onC
           <h5 className="modal-title-text font-monospace text-info m-0">
             &gt; OVERWRITE PARAMETER
           </h5>
-          <button type="button" className="btn-popup-close d-flex align-items-center justify-content-center" onClick={onClose}>
+          <button type="button" className="btn-close-dossier btn-popup-close d-flex align-items-center justify-content-center" onClick={onClose}>
             <X size={16} />
           </button>
         </div>

@@ -44,7 +44,7 @@ export default function UnifiedRegistryForm({
             {isEditMode ? <Edit3 size={14} className="text-warning me-2" /> : <PlusCircle size={14} className="text-info me-2" />}
             {isEditMode ? `MODIFY_${headline}` : `INITIALIZE_${headline}`}
           </h5>
-          <button type="button" className="btn-close-drawer" onClick={onClose}>
+          <button type="button" className="btn-close-dossier" onClick={onClose}>
             <X size={18} />
           </button>
         </div>

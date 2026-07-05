@@ -106,12 +106,6 @@ export default function SignInPage( { onLogin } ) {
               </button>
 
             </form>
-
-            <div className="auth-footer-navigation font-monospace">
-              <span className="text-muted-dim">Don't have an account? </span>
-              <NavLink to="/signup" className="auth-redirect-link">Sign up</NavLink>
-            </div>
-
           </div>
         </div>
 
