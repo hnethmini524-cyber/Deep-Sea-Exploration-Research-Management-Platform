@@ -164,10 +164,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
               {renderTabContent()}
             </div>
 
-            <button type="button" className="btn-dossier-download-node monospace-text">
-              &gt; DOWNLOAD ENVIRONMENTAL TELEMETRY
-            </button>
-
             {/* Dynamic metadata technical ledger grid */}
             <div className="dossier-metadata-table-wrapper mt-4">
               
@@ -267,10 +263,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                     <span className="meta-ledger-value text-info font-monospace">
                       [{assetData.latitude !== undefined && assetData.longitude !== undefined ? `${assetData.latitude}° N, ${assetData.longitude}° E` : "0.000° N, 0.000° E"}]
                     </span>
-                  </div>
-                  <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">ACTIVE MISSIONS DEPLOYED</span>
-                    <span className="meta-ledger-value text-warning fw-bold">[{assetData.activeMissionsCount || 0}]</span>
                   </div>
                 </>
               )}
