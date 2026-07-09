@@ -224,11 +224,18 @@ export default function MissionsPage() {
 
       if (editingMission && selectedMission) {
         const updatePayload = {
-          codeName: payload.codeName,
-          description: payload.description || 'No descriptions logged.',
-          startDate: payload.startDate,
-          endDate: payload.endDate || null,
-          status: payload.status
+          launchDate: payload.launchDate,
+          completionDate: payload.completionDate || null,
+          status: payload.status,
+
+          leadResearcherId: payload.leadResearcherId,
+          researchAreaId: payload.researchAreaId,
+
+          description: payload.description,
+          imageUrl: uploadedImageUrl,
+
+          sampleIds: payload.sampleIds || [],
+          speciesIds: payload.speciesIds || []
         };
 
         await apiService.updateMission(selectedMission.id, updatePayload);
@@ -268,12 +275,21 @@ export default function MissionsPage() {
 
   const handleEditClick = (mission) => {
     setEditingMission({
-      name: mission.codeName,
+      codeName: mission.codeName,
       description: mission.description,
-      startDate: mission.launchDate || mission.startDate,
-      endDate: mission.endDate || '',
+
+      launchDate: mission.launchDate,
+      completionDate: mission.completionDate,
+
       status: mission.status,
-      researchAreaId: mission.researchAreaId || mission.researchArea
+
+      leadResearcherId: mission.leadResearcherId,
+      researchAreaId: mission.researchAreaId,
+
+      sampleIds: mission.samples?.map(s => s.sampleId) || [],
+      speciesIds: mission.species?.map(s => s.id) || [],
+
+      imageUrl: mission.imageUrl
     });
     setSelectedMission(mission); 
     setIsFormOpen(true);
