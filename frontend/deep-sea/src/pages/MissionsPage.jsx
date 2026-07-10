@@ -216,10 +216,10 @@ export default function MissionsPage() {
   const handleFormSubmit = async (payload) => {
     setError(null);
     try {
-      let uploadedImageUrl = null;
-      
-      if (payload && payload.imageUrl) {
-        uploadedImageUrl = await apiService.uploadImage(payload.imageUrl);
+      let uploadedImageUrl = payload.imageUrl || null;
+
+      if (payload.imageUrl instanceof File) {
+          uploadedImageUrl = await apiService.uploadImage(payload.imageUrl);
       }
 
       if (editingMission && selectedMission) {
