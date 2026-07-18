@@ -6,7 +6,7 @@ export const FORM_SCHEMAS = {
       { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Enter telemetry deployment parameters...' },
       { name: 'launchDate', label: 'Start Date', type: 'date', required: true },
       { name: 'completionDate', label: 'End Date', type: 'date', required: true },
-      { name: 'status', label: 'Status', type: 'select', options: ['Planning', 'Active', 'Completed', 'Canceled'], required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Completed', 'Canceled'], required: true },
       { name: 'researchAreaId', label: 'Research Area', type: 'select', options: [] }, 
       { name: 'leadResearcherId', label: 'Assign Researchers', type: 'select', options: [] }, 
       { name: 'speciesIds', label: 'Species Observed', type: 'multiselect', options: [] },

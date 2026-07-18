@@ -55,7 +55,7 @@ export default function UnifiedRegistryForm({
             {fieldsArray.map((field) => {
               return (
                 <div key={field.name} className="form-group-node mb-3">
-                  <label className="form-label font-monospace text-muted small mb-1 text-white">
+                  <label className="form-label font-monospace text-white small mb-1 text-white">
                     {field.label} {field.required && <span className="text-danger">*</span>}
                   </label>
 

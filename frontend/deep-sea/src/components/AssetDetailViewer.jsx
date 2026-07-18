@@ -54,14 +54,9 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             <p className="text-info-cyan fw-bold mb-2">✦ Assigned Command Staff:</p>
             <div className="p-3 border border-secondary rounded bg-[#060b28] bg-opacity-40 font-monospace">
               <div className="mb-2">
-                <span className="text-muted small d-block" style={{ fontSize: '10px' }}>&gt; LEAD RESEARCHER</span>
+                <span className="text-white/40 small d-block" style={{ fontSize: '10px' }}>&gt; LEAD RESEARCHER</span>
                 <span className="text-white fw-bold fs-6">{assetData.leadResearcherName || "NO PERSONNEL ASSIGNED"}</span>
               </div>
-              {assetData.leadResearcherId && (
-                <div className="text-muted" style={{ fontSize: '11px', opacity: 0.7 }}>
-                  UUID: {assetData.leadResearcherId}
-                </div>
-              )}
             </div>
           </div>
         );
@@ -69,14 +64,14 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Species Observed':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Biological Description:</p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Species Description:</p>
             {assetData.species && assetData.species.length > 0 ? (
               <div className="d-flex flex-column gap-2 overflow-auto pe-1" style={{ maxHeight: '200px' }}>
                 {assetData.species.map((specimen) => (
                   <div key={specimen.id} className="p-2 border border-secondary rounded bg-[#060b28] bg-opacity-30 d-flex justify-content-between align-items-center font-monospace">
                     <div>
                       <span className="text-info d-block fw-bold" style={{ fontSize: '13px' }}>{specimen.commonName}</span>
-                      <span className="text-muted small italic"><i>{specimen.scientificName}</i></span>
+                      <span className="text-white/40 small italic"><i>{specimen.scientificName}</i></span>
                     </div>
                     {specimen.category && (
                       <span className="badge bg-secondary text-uppercase" style={{ fontSize: '10px' }}>{specimen.category}</span>
@@ -95,10 +90,10 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Samples Collected':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Ledger Logs:</p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Logs:</p>
             {assetData.samples && assetData.samples.length > 0 ? (
               <div className="table-responsive border border-secondary rounded overflow-hidden" style={{ maxHeight: '200px' }}>
-                <table className="table table-dark table-sm font-monospace m-0 align-middle" style={{ fontSize: '12px' }}>
+                <table className="table table-sm font-monospace m-0 align-middle" style={{ fontSize: '12px' }}>
                   <thead>
                     <tr className="text-muted bg-black bg-opacity-50" style={{ fontSize: '10px' }}>
                       <th className="p-2">CODE</th>

@@ -127,7 +127,7 @@ export default function ProfilePage() {
             
             return (
               <div key={field.key} className="form-group-node profile-data-item w-100">
-                <label className="form-label font-monospace text-muted small mb-1 d-block">
+                <label className="form-label font-monospace text-white/40 small mb-1 d-block">
                   {field.label}
                 </label>
                 
