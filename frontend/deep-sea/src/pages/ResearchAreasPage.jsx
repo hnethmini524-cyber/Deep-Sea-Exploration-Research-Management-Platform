@@ -133,7 +133,7 @@ export default function ResearchAreasPage() {
                 onClick={() => handleCardClick(area)}
               >
                 <div className="card-header-accent-strip d-flex justify-content-between">
-                  <span className="card-node-id font-monospace">ACTIVE NODE</span>
+                  <span className="card-node-id font-monospace">RESEARCH AREA</span>
                   <span className="card-status-indicator-pill">SECURED LEDGER</span>
                 </div>
                 

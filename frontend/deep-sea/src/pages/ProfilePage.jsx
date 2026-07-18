@@ -6,7 +6,7 @@ import { apiService } from '../service/ApiService';
 const FIELD_ICONS = {
   name: <UserCircle size={18} className="text-white-50" />,
   email: <Mail size={18} className="text-info" />,
-  speacial: <Zap size={18} className="text-warning" />,
+  specialization: <Zap size={18} className="text-warning" />,
   institution: <Building2 size={18} className="text-success" />
 };
 
@@ -120,7 +120,7 @@ export default function ProfilePage() {
           {[
             { key: 'name', label: 'Operator Full Name', editable: false},
             { key: 'email', label: 'Email Address', editable: true },
-            { key: 'speacial', label: 'Primary Specialization', editable: false },
+            { key: 'specialization', label: 'Primary Specialization', editable: false },
             { key: 'institution', label: 'Institutions Assigned', editable: true }
           ].map((field) => {
             const currentValue = operatorData?.[field.key] || '';

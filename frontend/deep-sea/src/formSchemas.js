@@ -17,7 +17,7 @@ export const FORM_SCHEMAS = {
   RESEARCHER: [
     { name: 'name', label: 'Full Name', type: 'text', placeholder: 'e.g., Dr. Arthur Vance', required: true },
     { name: 'email', label: 'Email Address', type: 'email', placeholder: 'vance@deepsea.org', required: true },
-    { name: 'speacial', label: 'Field Specialization', type: 'text', placeholder: 'e.g., Hydrothermal Dynamics', required: true },
+    { name: 'specialization', label: 'Field Specialization', type: 'text', placeholder: 'e.g., Hydrothermal Dynamics', required: true },
     { name: 'role', label: 'Operational Role', type: 'text', placeholder: 'e.g., Lead Telemetry Analyst', required: true },
     { name: 'institution', label: 'Affiliated Institution Base', type: 'text', placeholder: 'e.g., UK Campus', required: true }
   ],

@@ -114,7 +114,7 @@ export default function ResearcherPage() {
       const payload = {
         name: formData.name,
         email: formData.email || 'unknown@domain.com',
-        speacial: formData.speacial || 'General Systems',
+        specialization: formData.specialization || 'General Systems',
         role: formData.role || 'Unassigned Field Asset',
         institution: formData.institution || 'Independent Agent'
       };
@@ -215,7 +215,7 @@ export default function ResearcherPage() {
                   <tr key={researcher.id} className="table-body-row">
                     <td className="table-body-cell fw-bold text-white py-3">{researcher.name}</td>
                     <td className="table-body-cell data-cell-truncate text-muted">{researcher.email}</td>
-                    <td className="table-body-cell text-muted">{researcher.speacial || researcher.specialization}</td>
+                    <td className="table-body-cell text-muted">{researcher.specialization || 'Not specified'}</td>
                     <td className="table-body-cell text-muted">{researcher.role}</td>
                     <td className="table-body-cell text-info fw-bold">{researcher.institution}</td>
                     

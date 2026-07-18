@@ -33,7 +33,7 @@ public class Sample {
     @Column(nullable = false)
     private double depth; 
 
-    @Column(length = 1000)
+    @Column(length = 1500)
     private String description;
     
     @Column(name = "image_url", length = 512)

@@ -46,7 +46,7 @@ public class Species {
     @Column(columnDefinition = "TEXT") 
     private String observations;
 
-    @Column(length = 1000)
+    @Column(length = 1500)
     private String description;
     
     @ManyToMany(mappedBy = "species")
