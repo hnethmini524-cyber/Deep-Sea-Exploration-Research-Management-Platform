@@ -20,9 +20,16 @@ class ApiService {
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token');
+
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+
+        // Start performance measurement
+        config.metadata = {
+          startTime: performance.now()
+        };
+
         return config;
       },
       (error) => Promise.reject(error)
@@ -30,20 +37,51 @@ class ApiService {
 
     // Global error filtering & expired auth handling
     this.api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (
-          error.response?.status === 401 ||
-          error.response?.status === 403
-        ) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+    (response) => {
+      const startTime = response.config.metadata?.startTime;
 
-          window.location.href = "/signin";
-        }
-        return Promise.reject(this.#handleError(error));
+      if (startTime) {
+        const duration = performance.now() - startTime;
+        const method = response.config.method?.toUpperCase();
+        const url = response.config.url;
+
+        console.log(
+        `🌐 ${method} ${url} → ` +
+        `${response.status} ` +
+        `(${duration.toFixed(2)} ms)`
+        );
       }
-    );
+
+      return response;
+    },
+
+    (error) => {
+      const startTime = error.config?.metadata?.startTime;
+
+      if (startTime) {
+        const duration = performance.now() - startTime;
+
+        console.error(
+          `❌ ${error.config.method?.toUpperCase()} ` +
+          `${error.config.url} → ` +
+          `${error.response?.status || 'NETWORK ERROR'} ` +
+          `(${duration.toFixed(2)} ms)`
+        );
+    }
+
+    if (
+      error.response?.status === 401 ||
+      error.response?.status === 403
+    ) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      window.location.href = "/signin";
+    }
+
+    return Promise.reject(this.#handleError(error));
+  }
+);
   }
 
   // Global access point for the singleton instance
@@ -202,6 +240,11 @@ class ApiService {
   // Media uploading endpoint
 
   async uploadImage(file) {
+    const start = performance.now();
+
+    console.log(`📤 Upload started: ${file.name}`);
+    console.log(`📦 File size: ${file.size} bytes`);
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -210,8 +253,12 @@ class ApiService {
         "Content-Type": "multipart/form-data",
       }
     });
-    // Returns string payload (URL) context derived directly from backend controller layer
-    return response.data; 
+
+    console.log(
+      `📥 Upload completed in ${(performance.now() - start).toFixed(2)} ms`
+    );
+
+    return response.data;
   }
 }
 

@@ -78,6 +78,35 @@ Research Area Management - Manage exploration zones and research locations.
 - Database - MySQL
 - Version Control - GitHub
 
+---
+
+# 📌 API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/v1/auth/login | Authenticate user and receive JWT token |
+| POST | /api/v1/auth/confirm | Confirm password setup |
+| GET | /api/v1/dashboard | Get dashboard summary data |
+| POST | /api/v1/missions | Create a mission |
+| GET | /api/v1/missions | Get all missions |
+| GET | /api/v1/missions/{id} | Get specific mission |
+| PUT | /api/v1/missions/{id} | Update specific mission |
+| GET | /api/v1/areas | Get all research areas |
+| GET | /api/v1/areas/{id} | Get specific research area |
+| POST | /api/v1/areas | Create a research area |
+| GET | /api/v1/samples | Get all samples |
+| GET | /api/v1/samples/{id} | Get specific sample |
+| POST | /api/v1/samples | Create a sample |
+| GET | /api/v1/species | Get all species |
+| GET | /api/v1/species/{id} | Get specific species |
+| POST | /api/v1/species | Create a species |
+| POST | /api/v1/users/invite | Invite researchers to the system |
+| GET | /api/v1/users/researchers | Get all researchers |
+| GET | /api/v1/users/me | Get specific user profile |
+| PUT | /api/v1/users/me | Update specific user profile |
+| DELETE | /api/v1/users/{id} | Delete a users |
+| POST | /api/v1/images/upload | Upload image |
+
 ## Learning Goals
 
 This project is being developed to strengthen skills in:

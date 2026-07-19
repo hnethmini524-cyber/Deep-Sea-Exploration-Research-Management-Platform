@@ -21,8 +21,19 @@ public class ImageController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_RESEARCHER')")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadImage(
+            @RequestParam("file") MultipartFile file) {
+
+        long start = System.currentTimeMillis();
+
+        System.out.println("📥 Controller received file: "
+                + file.getOriginalFilename());
+
         String imageUrl = imageService.uploadImage(file);
+
+        System.out.println("📤 Controller total time: "
+                + (System.currentTimeMillis() - start) + " ms");
+
         return ResponseEntity.ok(imageUrl);
     }
 }

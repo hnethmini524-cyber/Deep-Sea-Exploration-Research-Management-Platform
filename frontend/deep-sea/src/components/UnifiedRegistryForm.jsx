@@ -39,8 +39,8 @@ export default function UnifiedRegistryForm({
       <div className="profile-drawer-box" onClick={(e) => e.stopPropagation()}>
         
         {/* Dynamic context header */}
-        <div className="drawer-header d-flex justify-content-between align-items-center">
-          <h5>
+        <div className="drawer-header d-flex justify-content-between align-items-start p-3">
+          <h5 className="pt-2 mb-0 d-flex align-items-center">
             {isEditMode ? <Edit3 size={14} className="text-warning me-2" /> : <PlusCircle size={14} className="text-info me-2" />}
             {isEditMode ? `MODIFY_${headline}` : `INITIALIZE_${headline}`}
           </h5>
