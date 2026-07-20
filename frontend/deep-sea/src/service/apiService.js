@@ -239,11 +239,53 @@ class ApiService {
 
   // Media uploading endpoint
 
+  async getImageUploadSignature() {
+    const response = await this.api.get("/images/signature");
+    return response.data;
+  }
+
+  async uploadImageDirectlyToCloudinary(file) {
+
+    const start = performance.now();
+
+    console.log(`Direct upload started: ${file.name}`);
+    console.log(`File size: ${file.size} bytes`);
+
+    // Step 1: Ask backend for secure upload signature
+    const signatureData = await this.getImageUploadSignature();
+
+    console.log(
+      `Signature received in ${(performance.now() - start).toFixed(2)} ms`
+    );
+
+    // Step 2: Create multipart payload for Cloudinary
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("api_key", signatureData.apiKey);
+    formData.append("timestamp", signatureData.timestamp);
+    formData.append("signature", signatureData.signature);
+
+    // Step 3: Upload directly from browser to Cloudinary
+    const cloudinaryResponse = await axios.post(
+      `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/image/upload`,
+      formData
+    );
+
+    const totalTime = performance.now() - start;
+
+    console.log(
+      `Direct Cloudinary upload completed in ${totalTime.toFixed(2)} ms`
+    );
+
+    return cloudinaryResponse.data.secure_url;
+  }
+
   async uploadImage(file) {
     const start = performance.now();
 
-    console.log(`📤 Upload started: ${file.name}`);
-    console.log(`📦 File size: ${file.size} bytes`);
+    console.log(`Upload started: ${file.name}`);
+    console.log(`File size: ${file.size} bytes`);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -255,7 +297,7 @@ class ApiService {
     });
 
     console.log(
-      `📥 Upload completed in ${(performance.now() - start).toFixed(2)} ms`
+      `Upload completed in ${(performance.now() - start).toFixed(2)} ms`
     );
 
     return response.data;

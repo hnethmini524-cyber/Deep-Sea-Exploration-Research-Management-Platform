@@ -107,8 +107,11 @@ export default function ObservationPage() {
     
       let uploadedImageUrl = null;
 
-      if (formData.imageUrl) {
-          uploadedImageUrl = await apiService.uploadImage(formData.imageUrl);
+      if (formData.imageUrl instanceof File) {
+              uploadedImageUrl =
+                  await apiService.uploadImageDirectlyToCloudinary(
+                      formData.imageUrl
+                  );
       }
       if (formConfig.type === 'SPECIES') {
       const speciesPayload = {

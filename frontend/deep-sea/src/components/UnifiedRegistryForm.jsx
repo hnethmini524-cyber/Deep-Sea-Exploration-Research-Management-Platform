@@ -34,6 +34,93 @@ export default function UnifiedRegistryForm({
     onSubmit(formData);
   };
 
+  function CustomMultiSelect({ field, value, onChange }) {
+
+    const toggleOption = (optionId) => {
+
+      const isSelected = value.includes(optionId);
+
+      if (isSelected) {
+        onChange(
+          value.filter(id => id !== optionId)
+        );
+      } else {
+        onChange([
+          ...value,
+          optionId
+        ]);
+      }
+    };
+
+    return (
+      <div className="custom-multiselect-wrapper">
+
+        <div className="custom-multiselect-list">
+
+          {field.options && field.options.length > 0 ? (
+
+            field.options.map(opt => {
+
+              const optionId =
+                typeof opt === 'object'
+                  ? opt.id
+                  : opt;
+
+              const optionLabel =
+                typeof opt === 'object'
+                  ? opt.name
+                  : opt;
+
+              const isSelected =
+                value.includes(optionId);
+
+              return (
+
+                <button
+                  type="button"
+                  key={optionId}
+                  className={`custom-multiselect-option ${
+                    isSelected
+                      ? 'selected'
+                      : ''
+                  }`}
+                  onClick={() =>
+                    toggleOption(optionId)
+                  }
+                >
+
+                  <span className="custom-option-checkbox">
+                    {isSelected ? '✓' : ''}
+                  </span>
+
+                  <span>
+                    {optionLabel}
+                  </span>
+
+                </button>
+
+              );
+
+            })
+
+          ) : (
+
+            <div className="text-muted text-center py-3">
+              -- No active telemetry nodes detected --
+            </div>
+
+          )}
+
+        </div>
+
+        <small className="text-muted font-monospace d-block mt-1 ps-1">
+          {value.length} item{value.length !== 1 ? 's' : ''} selected
+        </small>
+
+      </div>
+    );
+  }
+
   return (
     <div className="profile-drawer-backdrop" onClick={onClose}>
       <div className="profile-drawer-box" onClick={(e) => e.stopPropagation()}>
@@ -122,41 +209,15 @@ export default function UnifiedRegistryForm({
                     </div>
                   )}
 
-                  {/* Multiselect blocks */}
+                    {/* Custom Multi-Select */}
                   {field.type === 'multiselect' && (
-                    <div className="multiselect-group-wrapper position-relative">
-                      <select
-                        multiple
-                        className="registry-search-field w-100 form-select bg-dark text-white"
-                        
+                      <CustomMultiSelect
+                        field={field}
                         value={formData[field.name] || []}
-                        required={field.required}
-                        onChange={(e) => {
-                          const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-                          handleInputChange(field.name, selectedOptions);
-                        }}
-                      >
-                        {field.options && field.options.length > 0 ? (
-                          field.options.map(opt => {
-                            const optionId = typeof opt === "object" ? opt.id : opt;
-                            const optionLabel = typeof opt === "object" ? opt.name : opt;
-
-                            return (
-                              <option key={optionId} value={optionId}>
-                                {optionLabel}
-                              </option>
-                            );
-                          })
-                        ) : (
-                          <option disabled className="text-muted italic small text-center pt-4">
-                            -- No active telemetry nodes detected --
-                          </option>
-                        )}
-                      </select>
-                      <small className="text-muted font-monospace d-block mt-1 ps-1" style={{ fontSize: '10px', opacity: 0.6 }}>
-                        * Hold Ctrl (or Cmd) to isolate multiple items.
-                      </small>
-                    </div>
+                        onChange={(value) =>
+                          handleInputChange(field.name, value)
+                        }
+                      />
                   )}
 
                   {['text', 'email', 'date', 'number'].includes(field.type) && (

@@ -1,6 +1,7 @@
 package com.deepsea.deep_sea.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -18,57 +19,26 @@ public class ImageService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadImage(MultipartFile file) {
+    public Map<String, Object> generateUploadSignature() {
 
-        long start = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis() / 1000;
 
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Image file cannot be empty");
-        }
+        Map<String, Object> params = new HashMap<>();
 
-        System.out.println(
-            "📦 File size: " + file.getSize() + " bytes"
+        params.put("timestamp", timestamp);
+
+        String signature = cloudinary.apiSignRequest(
+                params,
+                cloudinary.config.apiSecret
         );
 
-        try {
-            long cloudinaryStart = System.currentTimeMillis();
+        Map<String, Object> response = new HashMap<>();
 
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(
-                file.getBytes(),
-                ObjectUtils.emptyMap()
-            );
+        response.put("signature", signature);
+        response.put("timestamp", timestamp);
+        response.put("apiKey", cloudinary.config.apiKey);
+        response.put("cloudName", cloudinary.config.cloudName);
 
-            long cloudinaryDuration =
-                    System.currentTimeMillis() - cloudinaryStart;
-
-            System.out.println(
-                "☁️ Cloudinary upload took: "
-                + cloudinaryDuration
-                + " ms"
-            );
-
-            String imageUrl = uploadResult
-                    .get("secure_url")
-                    .toString();
-
-            System.out.println(
-                "🏁 ImageService total time: "
-                + (System.currentTimeMillis() - start)
-                + " ms"
-            );
-
-            return imageUrl;
-
-        } catch (IOException e) {
-            System.err.println(
-                "❌ Failed to read uploaded image: "
-                + e.getMessage()
-            );
-
-            throw new RuntimeException(
-                "Failed to process uploaded image",
-                e
-            );
-        }
+        return response;
     }
 }

@@ -58,9 +58,12 @@ export default function ResearchAreasPage() {
     try {
       let uploadedImageUrl = null;
       
-            if (formData.imageUrl) {
-                uploadedImageUrl = await apiService.uploadImage(formData.imageUrl);
-            }
+        if (formData.imageUrl instanceof File) {
+                uploadedImageUrl =
+                    await apiService.uploadImageDirectlyToCloudinary(
+                        formData.imageUrl
+                    );
+              }
       
       const newPayload = {
         areaName: formData.areaName,

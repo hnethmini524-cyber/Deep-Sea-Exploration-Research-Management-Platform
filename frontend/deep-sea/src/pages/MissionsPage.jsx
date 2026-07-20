@@ -219,7 +219,10 @@ export default function MissionsPage() {
       let uploadedImageUrl = payload.imageUrl || null;
 
       if (payload.imageUrl instanceof File) {
-          uploadedImageUrl = await apiService.uploadImage(payload.imageUrl);
+        uploadedImageUrl =
+            await apiService.uploadImageDirectlyToCloudinary(
+                payload.imageUrl
+            );
       }
 
       if (editingMission && selectedMission) {
