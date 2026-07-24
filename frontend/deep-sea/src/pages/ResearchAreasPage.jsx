@@ -15,7 +15,7 @@ export default function ResearchAreasPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Server-side Pagination Configuration (Spring Boot pages start at index 0)
+  // Server-side Pagination Configuration 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);

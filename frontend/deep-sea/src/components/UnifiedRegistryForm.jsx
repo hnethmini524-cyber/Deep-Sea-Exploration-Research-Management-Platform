@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, Upload, Edit3, PlusCircle } from 'lucide-react';
 
 export default function UnifiedRegistryForm({ 
-  headline = "REGISTRY_NODE_OPERATION",
+  headline = "REGISTRY NODE OPERATION",
   schema = [], 
   initialData = null, 
   onClose, 
@@ -129,7 +129,7 @@ export default function UnifiedRegistryForm({
         <div className="drawer-header d-flex justify-content-between align-items-start p-3">
           <h5 className="pt-2 mb-0 d-flex align-items-center">
             {isEditMode ? <Edit3 size={14} className="text-warning me-2" /> : <PlusCircle size={14} className="text-info me-2" />}
-            {isEditMode ? `MODIFY_${headline}` : `INITIALIZE_${headline}`}
+            {isEditMode ? `MODIFY ${headline}` : `INITIALIZE ${headline}`}
           </h5>
           <button type="button" className="btn-close-dossier" onClick={onClose}>
             <X size={18} />

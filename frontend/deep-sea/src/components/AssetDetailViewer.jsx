@@ -43,7 +43,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Observations':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Field Operational Record Log: </p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Field Observations Log: </p>
             <p className="monospace-text">{assetData.observations || "No real-time environmental telemetry data logged."}</p>
           </div>
         );
@@ -51,7 +51,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
       case 'Researchers':
         return (
           <div className="dossier-sub-list">
-            <p className="text-info-cyan fw-bold mb-2">✦ Assigned Command Staff:</p>
+            <p className="text-info-cyan fw-bold mb-2">✦ Assigned Lead Researcher:</p>
             <div className="p-3 border border-secondary rounded bg-[#060b28] bg-opacity-40 font-monospace">
               <div className="mb-2">
                 <span className="text-white/40 small d-block" style={{ fontSize: '10px' }}>&gt; LEAD RESEARCHER</span>
@@ -93,7 +93,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
             <p className="text-info-cyan fw-bold mb-2">✦ Core Sample Logs:</p>
             {assetData.samples && assetData.samples.length > 0 ? (
               <div className="table-responsive border border-secondary rounded overflow-hidden" style={{ maxHeight: '200px' }}>
-                <table className="table table-sm font-monospace m-0 align-middle" style={{ fontSize: '12px' }}>
+                <table className="table bg-dark table-sm font-monospace m-0 align-middle" style={{ fontSize: '12px' }}>
                   <thead>
                     <tr className="text-muted bg-black bg-opacity-50" style={{ fontSize: '10px' }}>
                       <th className="p-2">CODE</th>
@@ -166,7 +166,7 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
               {currentContext === 'mission' && (
                 <>
                   <div className="meta-ledger-row">
-                    <span className="meta-ledger-key">MISSION CODE NAME</span>
+                    <span className="meta-ledger-key">MISSION NAME</span>
                     <span className="meta-ledger-value text-info fw-bold text-truncate">
                       [{assetData.codeName || assetData.missionName || assetData.name || "—"}]
                     </span>
@@ -274,7 +274,6 @@ export default function AssetDetailViewer({ isOpen, onClose, assetData }) {
                 alt="Operational telemetry visual capture" 
                 className="dossier-main-display-graphic"
               />
-              <div className="dossier-image-stamp-watermark monospace-text">SECURED RECORD</div>
             </div>
           </div>
 
